@@ -11,13 +11,20 @@ st.set_page_config(page_title="Chaos Gacha Web", layout="centered")
 
 # ------------------ LOAD EXISTING HISTORY ------------------
 st.sidebar.header("📂 Load Previous History")
-uploaded_file = st.sidebar.file_uploader("Upload history CSV", type="csv")
+uploaded_file = st.sidebar.file_uploader("Upload history CSV (UTF-8)", type=["csv"])
+
+if "log" not in st.session_state:
+    st.session_state["log"] = []
 
 if uploaded_file:
     try:
-        df_loaded = pd.read_csv(uploaded_file)
-        st.session_state["log"] = df_loaded.to_dict(orient="records")
-        st.sidebar.success("✅ History loaded successfully.")
+        df_loaded = pd.read_csv(uploaded_file, encoding="utf-8")
+        expected_columns = {"Type", "Element", "Rarity", "Tier", "Luck", "Description", "Color"}
+        if expected_columns.issubset(df_loaded.columns):
+            st.session_state["log"] = df_loaded.to_dict(orient="records")
+            st.sidebar.success("✅ History loaded successfully.")
+        else:
+            st.sidebar.error("❌ CSV format is invalid. Expected columns are missing.")
     except Exception as e:
         st.sidebar.error(f"❌ Error loading file: {e}")
 
@@ -75,7 +82,7 @@ def randomizer(min_val, max_val, avg, exponent):
         x += 0.1
 
     if not randarr or not weights:
-        return avg  # fallback
+        return avg
 
     rarity = random.choices(randarr, weights)[0] + 0.1
     return float(rarity)
@@ -89,8 +96,7 @@ def run_gacha(mode, min_val, avg, max_val, max_tries=10):
                     if abs(r - raritypull) <= 0.2]
 
         if filtered:
-            penalty = 1.0 - ((attempt - 1) * 0.05)
-            penalty = max(penalty, 0.7)
+            penalty = max(1.0 - ((attempt - 1) * 0.05), 0.7)
             adjusted_weights = [w * penalty for _, w, _, _ in filtered]
             selected = random.choices(filtered, weights=adjusted_weights)[0]
             element, weight, rarity, desc = selected
@@ -283,9 +289,9 @@ if st.session_state["log"]:
     log_html += "</div>"
     html(log_html, height=550)
 
-    df_log = pd.DataFrame(st.session_state['log'])  
+    df_log = pd.DataFrame(st.session_state["log"])
     csv_buffer = io.StringIO()
-    df_log.to_csv(csv_buffer, index=False)
+    df_log.to_csv(csv_buffer, index=False, encoding="utf-8")
     csv_data = csv_buffer.getvalue()
 
     st.download_button(
