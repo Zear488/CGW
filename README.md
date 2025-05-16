@@ -45,4 +45,4 @@ pyinstaller --onefile --add-data "gachafiles;gachafiles" Gacha_app.py
 ---
 
 ### Credits
-This project was inspired by the original work of Bronzdeck
+This project was inspired by the original work of Bronzdeck.
