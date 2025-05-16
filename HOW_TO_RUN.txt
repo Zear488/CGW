@@ -1,0 +1,58 @@
+# Cómo ejecutar Chaos Gacha en tu PC (sin usar Streamlit Cloud)
+
+## Requisitos
+
+- Python 3.8 o superior instalado.
+- Acceso a la línea de comandos (CMD, PowerShell o Terminal).
+- Conexión a Internet para instalar dependencias (solo la primera vez).
+
+---
+
+## Opción 1: Ejecutar como script Python
+
+### 1. Instalar dependencias
+
+Abre una terminal (CMD, PowerShell) y ejecuta:
+
+```
+pip install streamlit pandas
+```
+
+### 2. Ejecutar la aplicación
+
+Ubícate en el directorio donde está `Gacha_app.py` y escribe:
+
+```
+streamlit run Gacha_app.py
+(Optional example if it doesn't work)
+cd %HOMEPATH%\Downloads\Chaos_Gacha_Files
+```
+
+Esto abrirá tu navegador con la app localmente en `http://localhost:8501`.
+
+---
+
+## Opción 2: Crear un archivo .exe (para no depender de Python)
+
+### 1. Instalar PyInstaller
+
+```
+pip install pyinstaller
+```
+
+### 2. Generar el ejecutable
+
+Desde la misma carpeta donde está el script, ejecuta:
+
+```
+pyinstaller --onefile --add-data "gachafiles;gachafiles" Gacha_app.py
+```
+
+Esto generará un archivo `ChaosGacha.exe` en la carpeta `dist`.
+
+### 3. Ejecutar el .exe
+
+Ve a la carpeta `dist` y haz doble clic en `ChaosGacha.exe`.
+
+> ⚠️ Asegúrate de que la carpeta `gachafiles` se haya incluido correctamente. Si no aparece en el .exe, colócala manualmente junto al ejecutable.
+
