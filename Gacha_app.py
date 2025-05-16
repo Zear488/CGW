@@ -293,7 +293,7 @@ if st.session_state.get("log"):
     df_log = pd.DataFrame(st.session_state["log"])
     csv_buffer = io.StringIO()
     df_log.to_csv(csv_buffer, index=False, encoding="utf-8")
-    csv_data = csv_buffer.getvalue().encode("utf-8")  # compatible con móviles
+    csv_data = csv_buffer.getvalue().encode("utf-8-sig") 
 
     st.download_button(
         label="⬇️ Download history as CSV",
