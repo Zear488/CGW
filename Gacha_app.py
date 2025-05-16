@@ -127,6 +127,39 @@ def get_tier_and_color(rarity):
 # ------------------ STREAMLIT INTERFACE ------------------
 st.title("🎲 Chaos Gacha Web")
 
+with st.expander("ℹ️ What do 'Rarity' and 'Estimated Luck' mean?"):
+    st.markdown("""
+    **🧪 Rarity** is a value between `0.1` and `10.0` that represents how special or powerful an element is. The higher the number, the rarer it is.
+
+    | Tier           | Rarity Range   | Color        |
+    |----------------|----------------|--------------|
+    | Trash          | < 1.0          | Brown        |
+    | Common         | 1.0 – 2.0      | Bronze       |
+    | Uncommon       | 2.0 – 3.0      | Teal         |
+    | Rare           | 3.0 – 4.0      | Green        |
+    | Elite          | 4.0 – 5.0      | Blue         |
+    | Epic           | 5.0 – 6.0      | Purple       |
+    | Legendary      | 6.0 – 7.0      | Gold         |
+    | Mythical       | 7.0 – 8.0      | Pink         |
+    | Divine         | 8.0 – 9.0      | Orange       |
+    | Transcendent   | > 9.0          | Red          |
+
+    ---
+
+    **🍀 Estimated Luck** shows how unlikely it was to pull this element:
+
+    | Estimated Luck | Interpretation             |
+    |----------------|----------------------------|
+    | > 30%          | Very Common                |
+    | 10% – 30%      | Uncommon                   |
+    | 1% – 10%       | Rare                       |
+    | < 1%           | Extremely Rare / Epic Pull |
+
+    The lower the percentage, the luckier you were.
+
+    This value is calculated based on the rarity and the configured search range.
+    """)
+
 presets = {
     "Bronze": ((0.1, 1.3, 3.3), "#cd7f32"),
     "Silver": ((0.5, 2.3, 4.3), "#c0c0c0"),
