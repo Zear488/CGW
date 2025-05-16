@@ -242,7 +242,7 @@ if st.button("🎰 Roll", type="primary"):
     else:
         st.warning("No valid result found. Try adjusting the rarity range.")
 
-if st.session_state["log"]:
+if st.session_state.get("log"):
     st.markdown("## 📜 Roll History")
     st.markdown(f"Total Rolls: **{len(st.session_state['log'])}**")
 
@@ -289,14 +289,15 @@ if st.session_state["log"]:
     log_html += "</div>"
     html(log_html, height=550)
 
+    # 🟢 Crear CSV descargable compatible
     df_log = pd.DataFrame(st.session_state["log"])
     csv_buffer = io.StringIO()
     df_log.to_csv(csv_buffer, index=False, encoding="utf-8")
-    csv_data = csv_buffer.getvalue()
+    csv_data = csv_buffer.getvalue().encode("utf-8")  # compatible con móviles
 
     st.download_button(
         label="⬇️ Download history as CSV",
         data=csv_data,
         file_name="gacha_history.csv",
-        mime="text/csv"
+        mime="text/csv",
     )
