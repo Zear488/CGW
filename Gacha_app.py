@@ -18,13 +18,13 @@ if "log" not in st.session_state:
 
 if uploaded_file:
     try:
-        df_loaded = pd.read_csv(uploaded_file, encoding="utf-8")
-        expected_columns = {"Type", "Element", "Rarity", "Tier", "Luck", "Description", "Color"}
-        if expected_columns.issubset(df_loaded.columns):
+        df_loaded = pd.read_csv(uploaded_file, encoding="utf-8-sig")
+        required_cols = {"Type", "Element", "Rarity", "Tier", "Luck", "Description", "Color"}
+        if required_cols.issubset(set(df_loaded.columns)):
             st.session_state["log"] = df_loaded.to_dict(orient="records")
             st.sidebar.success("✅ History loaded successfully.")
         else:
-            st.sidebar.error("❌ CSV format is invalid. Expected columns are missing.")
+            st.sidebar.error("❌ Invalid CSV format. Columns missing.")
     except Exception as e:
         st.sidebar.error(f"❌ Error loading file: {e}")
 
@@ -246,6 +246,7 @@ if st.session_state.get("log"):
     st.markdown("## 📜 Roll History")
     st.markdown(f"Total Rolls: **{len(st.session_state['log'])}**")
 
+    # Mostrar historial como HTML
     log_html = """
     <div style='
         max-height: 500px;
@@ -258,7 +259,6 @@ if st.session_state.get("log"):
         background-color: #1e1e1e;
     '>
     """
-
     for i, entry in enumerate(reversed(st.session_state["log"]), 1):
         color = entry.get("Color", "#f0f0f0")
         log_html += f"""
@@ -285,19 +285,18 @@ if st.session_state.get("log"):
             '>{entry.get("Description", "No description")}</div>
         </div>
         """
-
     log_html += "</div>"
     html(log_html, height=550)
 
-    # 🟢 Crear CSV descargable compatible
+    # Exportar CSV con BOM para compatibilidad móvil (S23 y otros)
     df_log = pd.DataFrame(st.session_state["log"])
     csv_buffer = io.StringIO()
-    df_log.to_csv(csv_buffer, index=False, encoding="utf-8")
-    csv_data = csv_buffer.getvalue().encode("utf-8-sig") 
+    df_log.to_csv(csv_buffer, index=False, encoding="utf-8-sig")  # <- BOM encoding
+    csv_data = csv_buffer.getvalue()
 
     st.download_button(
         label="⬇️ Download history as CSV",
         data=csv_data,
         file_name="gacha_history.csv",
-        mime="text/csv",
+        mime="text/csv"
     )
