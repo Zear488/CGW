@@ -300,3 +300,125 @@ if st.session_state.get("log"):
         file_name="gacha_history.csv",
         mime="text/csv"
     )
+
+    import os
+from datetime import datetime
+import streamlit as st
+
+# Carpetas que usarás:
+# - "Original_gachafiles" para los archivos originales
+# - "gachafiles" para los archivos editados actuales
+# - "gachafiles_versions" para versiones guardadas (historial)
+
+# Crear carpetas si no existen
+for folder in ["Original_gachafiles", "gachafiles", "gachafiles_versions"]:
+    if not os.path.exists(folder):
+        os.makedirs(folder)
+
+# Inicializar session_state
+if "original_files" not in st.session_state:
+    st.session_state["original_files"] = {}
+
+if "edited_files" not in st.session_state:
+    st.session_state["edited_files"] = {}
+
+# Lista de gachafiles según carpeta "gachafiles"
+gachafile_options = [f.replace(".txt", "") for f in os.listdir("gachafiles") if f.endswith(".txt")]
+selected_gachafile = st.selectbox("Select a Gacha File to view/edit", gachafile_options)
+
+# Cargar original si no existe en session_state (desde Original_gachafiles)
+if selected_gachafile not in st.session_state["original_files"]:
+    path_original = os.path.join("Original_gachafiles", f"{selected_gachafile}.txt")
+    with open(path_original, "r", encoding="utf-8") as f:
+        content = f.read()
+    st.session_state["original_files"][selected_gachafile] = content
+
+# Cargar editado si no existe (desde gachafiles)
+if selected_gachafile not in st.session_state["edited_files"]:
+    path_edit = os.path.join("gachafiles", f"{selected_gachafile}.txt")
+    with open(path_edit, "r", encoding="utf-8") as f:
+        content_edit = f.read()
+    st.session_state["edited_files"][selected_gachafile] = content_edit
+
+edit_key = f"edit_area_{selected_gachafile}"
+
+# Inicializar textarea controlado
+if edit_key not in st.session_state:
+    st.session_state[edit_key] = st.session_state["edited_files"][selected_gachafile]
+
+# Botón Restore Original
+if st.button("♻️ Restore Original"):
+    st.session_state[edit_key] = st.session_state["original_files"][selected_gachafile]
+    st.session_state["edited_files"][selected_gachafile] = st.session_state["original_files"][selected_gachafile]
+    st.success(f"Restored original `{selected_gachafile}`.")
+
+# Mostrar textarea editable
+content = st.text_area(
+    label=f"Edit {selected_gachafile}",
+    value=st.session_state[edit_key],
+    key=edit_key,
+    height=300,
+)
+
+# Actualizar el contenido editado en session_state
+st.session_state["edited_files"][selected_gachafile] = st.session_state[edit_key]
+
+# Botón Guardar cambios manual
+if st.button("💾 Save Changes"):
+    path = os.path.join("gachafiles", f"{selected_gachafile}.txt")
+    try:
+        with open(path, "w", encoding="utf-8") as f:
+            f.write(st.session_state["edited_files"][selected_gachafile])
+        st.success(f"✅ Changes saved to `{selected_gachafile}.txt`.")
+
+        # Guardar versión automática con timestamp
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        version_path = os.path.join("gachafiles_versions", f"{selected_gachafile}_{timestamp}.txt")
+        with open(version_path, "w", encoding="utf-8") as f:
+            f.write(st.session_state["edited_files"][selected_gachafile])
+
+    except Exception as e:
+        st.error(f"❌ Error saving file: {e}")
+
+st.markdown("---")
+st.subheader("Saved Versions")
+
+# Listar versiones guardadas
+version_files = sorted(
+    [f for f in os.listdir("gachafiles_versions") if f.startswith(selected_gachafile) and f.endswith(".txt")],
+    reverse=True,
+)
+
+for vf in version_files:
+    col1, col2 = st.columns([2,1])
+    with col1:
+        if st.button(f"Restore {vf}", key=f"restore_{vf}"):
+            with open(os.path.join("gachafiles_versions", vf), "r", encoding="utf-8") as f:
+                version_content = f.read()
+            st.session_state[edit_key] = version_content
+            st.session_state["edited_files"][selected_gachafile] = version_content
+            st.success(f"✅ Restored version: {vf}")
+            # No experimental_rerun, el cambio se refleja al actualizar textarea
+    with col2:
+        with open(os.path.join("gachafiles_versions", vf), "rb") as f:
+            st.download_button(
+                label="Download",
+                data=f,
+                file_name=vf,
+                mime="text/plain",
+                key=f"download_{vf}"
+            )
+
+# Guardar automáticamente todos los archivos editados al iniciar
+for fname in gachafile_options:
+    content_to_save = st.session_state["edited_files"].get(fname)
+    if content_to_save:
+        file_path = os.path.join("gachafiles", f"{fname}.txt")
+        with open(file_path, "w", encoding="utf-8") as f:
+            f.write(content_to_save)
+
+        # Guardar versión automática con timestamp
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        version_path = os.path.join("gachafiles_versions", f"{fname}_{timestamp}.txt")
+        with open(version_path, "w", encoding="utf-8") as f:
+            f.write(content_to_save)
