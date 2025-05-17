@@ -19,7 +19,7 @@ Chaos_Gacha/
 
 ---
 
-## 🚀 Usage
+##  Usage
 
 1. Make sure you have Python 3.8 or higher.
 2. Install Streamlit:
@@ -52,17 +52,17 @@ pyinstaller --onefile ^
 
 ---
 
-## 🌐 Online Version
+##  Online Version
 
 You can try the web version of this app hosted on Streamlit Cloud:  
 🔗 https://gachaapppy-9q6feaejxgdf4bbxwkkywx.streamlit.app/
 
 ---
 
-## 🙌 Credits
+## Credits
 
 This project was inspired by the original work of **BronzDeck**.  
 If you like this project, please consider supporting the original author:
 
-- 💖 [Patreon](https://www.patreon.com/BronzDeck)  
-- 🛠️ [GitHub](https://github.com/Bronzdeck/ChaosGacha)
+-  [Patreon](https://www.patreon.com/BronzDeck)  
+-  [GitHub](https://github.com/Bronzdeck/ChaosGacha)
