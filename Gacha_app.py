@@ -38,7 +38,6 @@ def read_file_with_weight(filename, avg, min_val, max_val):
     min_rarity = float(min_val)
     avg_rarity = float(avg)
     max_rarity = float(max_val)
-    weightsum = 0
 
     if filename == "Random":
         filename = random.choice(["Ability", "Item", "Familiar", "Trait", "Skill"])
@@ -53,11 +52,9 @@ def read_file_with_weight(filename, avg, min_val, max_val):
                 parts = line.strip().split(",")
                 element, rarity = parts[0], float(parts[1])
                 elements.append(element)
-                weight = 1 / (pow(4, abs(avg - rarity)))
+                weight = 1 / (pow(4, abs(avg_rarity - rarity)))
                 weights.append(weight)
                 rarities.append(rarity)
-                if min_rarity < rarity <= max_rarity:
-                    weightsum += weight
                 if tempdescription:
                     descriptions.append(" ".join(tempdescription).strip())
                     tempdescription = []
@@ -65,6 +62,8 @@ def read_file_with_weight(filename, avg, min_val, max_val):
                 tempdescription.append(line)
         if tempdescription:
             descriptions.append(" ".join(tempdescription).strip())
+
+    weightsum = sum(weights)  # Sum ALL weights here, not filtered subset
 
     return elements, weights, rarities, descriptions, weightsum, chosentype
 
@@ -88,8 +87,9 @@ def randomizer(min_val, max_val, avg, exponent):
     rarity = random.choices(randarr, weights)[0] + 0.1
     return float(rarity)
 
+
 def run_gacha(mode, min_val, avg, max_val, max_tries=10):
-    elements, base_weights, rarities, descriptions, weightsum, chosentype = read_file_with_weight(mode, avg, min_val, max_val)
+    elements, base_weights, rarities, descriptions, _, chosentype = read_file_with_weight(mode, avg, min_val, max_val)
 
     for attempt in range(1, max_tries + 1):
         raritypull = randomizer(min_val, max_val, avg, 4)
@@ -99,9 +99,15 @@ def run_gacha(mode, min_val, avg, max_val, max_tries=10):
         if filtered:
             penalty = max(1.0 - ((attempt - 1) * 0.05), 0.7)
             adjusted_weights = [w * penalty for _, w, _, _ in filtered]
+
+            filtered_weights_sum = sum(w for _, w, _, _ in filtered)
+            if filtered_weights_sum == 0:
+                st.error("❌ Internal error: division by zero (filtered weights sum is zero).")
+                return None
+
             selected = random.choices(filtered, weights=adjusted_weights)[0]
             element, weight, rarity, desc = selected
-            luckpercentage = 100 * weight / weightsum
+            luckpercentage = 100 * weight / filtered_weights_sum
 
             return {
                 "element": element,
