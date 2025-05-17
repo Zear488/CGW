@@ -16,7 +16,6 @@ uploaded_file = st.sidebar.file_uploader("Upload history CSV (UTF-8)", type=["cs
 if "log" not in st.session_state:
     st.session_state["log"] = []
     
-
 if uploaded_file:
     try:
         df_loaded = pd.read_csv(uploaded_file, encoding="utf-8-sig")
@@ -86,7 +85,6 @@ def randomizer(min_val, max_val, avg, exponent):
 
     rarity = random.choices(randarr, weights)[0] + 0.1
     return float(rarity)
-
 
 def run_gacha(mode, min_val, avg, max_val, max_tries=10):
     elements, base_weights, rarities, descriptions, _, chosentype = read_file_with_weight(mode, avg, min_val, max_val)
@@ -295,7 +293,7 @@ if st.session_state.get("log"):
     log_html += "</div>"
     html(log_html, height=550)
 
-    # Exportar CSV con BOM para compatibilidad móvil (S23 y otros)
+    # Exportar CSV con BOM para compatibilidad móvil 
     df_log = pd.DataFrame(st.session_state["log"])
     csv_buffer = io.StringIO()
     df_log.to_csv(csv_buffer, index=False, encoding="utf-8-sig")  # <- BOM encoding
@@ -310,7 +308,7 @@ if st.session_state.get("log"):
 
 from datetime import datetime
 
-# Carpetas que usarás:
+# Carpetas que usadas:
 # - "Original_gachafiles" para los archivos originales
 # - "gachafiles" para los archivos editados actuales
 # - "gachafiles_versions" para versiones guardadas (historial)
@@ -437,7 +435,6 @@ if version_files:
 else:
     st.info("No saved versions available for this file.")
 
-
     st.markdown("## 🗑️ Manage Saved Versions")
 
 version_folder = "gachafiles_versions"
@@ -461,8 +458,7 @@ if version_files:
         "Select versions to delete:",
         version_files,
         help="These are saved historical versions of the current file."
-
-        
+       
     )
     if st.button("❌ Delete Selected Versions"):
         deleted = []
@@ -498,7 +494,6 @@ if all_versions:
             st.success("✅ All saved versions deleted.")
         except Exception as e:
             st.error(f"❌ Error deleting versions: {e}")
-
             
 else:
     st.info("There are no saved versions in the system.")
@@ -531,7 +526,7 @@ if uploaded_version:
 
 elif manual_text.strip():
     version_content = manual_text.strip()
-    # Para contenido manual, el usuario debe elegir la categoría explícitamente
+    # Para contenido manual, el usuario debe elegir la categoría explícitamente.
     base_name = st.selectbox("📂 Assign content to category", options=gachafile_options, key="manual_category_select")
     st.text_area("📄 Preview of pasted content", version_content, height=200, key="manual_preview", disabled=True)
 
