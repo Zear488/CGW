@@ -502,6 +502,11 @@ import re
 st.subheader("📤 Upload a Saved Version to Load")
 
 uploaded_version = st.file_uploader("Upload a saved version (.txt)", type=["txt"], key="upload_saved_version")
+manual_text = st.text_area("📋 Or paste the content manually", height=200, key="manual_upload_text")
+
+# Variables para almacenar contenido y categoría detectada
+version_content = None
+base_name = None
 
 if uploaded_version:
     filename = uploaded_version.name
@@ -511,25 +516,24 @@ if uploaded_version:
         base_name = name_match.group(1)
 
         if base_name in gachafile_options:
-            uploaded_content = uploaded_version.read().decode("utf-8")
-
-            st.text_area(f"📄 Preview of '{filename}'", uploaded_content, height=200, key="uploaded_version_preview", disabled=True)
-
-            if st.button(f"📥 Cargar a 'Saved Versions' como nueva versión de '{base_name}'", key="load_uploaded_to_versions"):
-                # Guardar en historial de versiones
-                if base_name not in st.session_state["gachafiles_versions"]:
-                    st.session_state["gachafiles_versions"][base_name] = []
-
-                st.session_state["gachafiles_versions"][base_name].append(uploaded_content)
-
-                # También actualizar como archivo editable actual
-                st.session_state["edited_files"][base_name] = uploaded_content
-
-                st.success(f"✅ Archivo cargado como nueva versión de '{base_name}' y también actualizado como editable.")
+            version_content = uploaded_version.read().decode("utf-8")
+            st.text_area(f"📄 Preview of '{filename}'", version_content, height=200, key="uploaded_version_preview", disabled=True)
         else:
             st.error(f"❌ Unknown file: '{base_name}' is not a valid gacha category.")
     else:
         st.error("❌ Invalid filename format. Use a file starting with the category name, like 'Item_*.txt'")
 
-        
+elif manual_text.strip():
+    version_content = manual_text.strip()
+    # Para contenido manual, el usuario debe elegir la categoría explícitamente
+    base_name = st.selectbox("📂 Assign content to category", options=gachafile_options, key="manual_category_select")
+    st.text_area("📄 Preview of pasted content", version_content, height=200, key="manual_preview", disabled=True)
+
+if version_content and base_name:
+    if st.button(f"📥 Load to 'Saved Versions' as new version of '{base_name}'", key="load_uploaded_to_versions"):
+        st.session_state.setdefault("gachafiles_versions", {}).setdefault(base_name, []).append(version_content)
+        st.session_state.setdefault("edited_files", {})[base_name] = version_content
+        if base_name not in st.session_state.get("original_files", {}):
+            st.session_state.setdefault("original_files", {})[base_name] = version_content
+        st.success(f"✅ Version added to saved history under '{base_name}' and updated as editable.")
 
