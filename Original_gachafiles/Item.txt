@@ -824,3 +824,39 @@
 #RWBY - A large jar containing evil black goop that summons lesser Grimm once it lands on a stable surface. The summoned lesser Grimm are loyal to you.
 412.The Stand Arrow,5.1
 #JoJo - An ornate arrow made out of a meteorite from outer space, those stabbed by this arrow are infected by it, either slowly succumbing to a severe fever or having enough willpower and potential to survive and awaken a stand(Roll a Platinum Ticket to decide which stand gets awakened in the target.)
+413.Wolverine's Skeleton,3.4
+#Marvel - Wolverine's Adamantium Bonded Skeleton freshly picked off of his body as he was sleeping. As the skeleton is bonded with Adamantium it is virtually unbreakable albeit a bit short. Don't worry about a Wolverine regenerating from it as all genetic material has been scrubbed clean.
+414.Nano Machine heart,6.4
+#Metal Gear Rising Revengance - A super high-tech nanomachine heart that belonged to Senator Armstrong. By having this heart implanted in you, it gives you access to powerful nanomachines that enhance your physiology massively, allow you to absorb other nanomachines, drain electricity to charge itself and harden in response to physical trauma or on command. 
+415.Danzo's Right Arm,6.5
+#Naruto - Danzo's Right Arm torn fresh off of the torso in mint condition. This right arm is made up of Hashirama cells and implanted with 10 sharingans. You can either implant this arm onto your own body to enjoy the benefits of Sharingan and Hashirama cells or dismantle it to use all parts separately.
+416.Hashirama Cells,5.4
+#Naruto - A vial containing the living cells of Hashirama Senju, due to the sheer potency of Hashirama's genetics if you successfully manage to implant these cells in your body, they will increase your vitality and energy reserves considerably. Not only that but they also grant you considerable passive regenerative ability that consumes your energy.
+417.Rinnegan,7.2
+#Naruto - A pair of Rinnegan plucked fresh off of Nagato's body contained in preserving fluid. These eyes can be surgically implanted in yourself or others to gain access to their abilities. Beware, you will need a lot of energy to handle them.
+418.Fire Release Jutsu Scroll,5.2
+#Naruto - A large scroll containing information on all Fire Release Jutsu recorded inside up to A rank that allows the user to study and train to learn the Fire Jutsu that are recorded inside. Those without the user's permission cannot understand what is inside the scroll. 
+419.Water Release Jutsu Scroll,5.6
+#Naruto - A large scroll containing information on all Water Release Jutsu recorded inside up to A rank that allows the user to study and train to learn the Water Jutsu that are recorded inside. Those without the user's permission cannot understand what is inside the scroll. 
+420.Wind Release Jutsu Scroll,6.0
+#Naruto - A large scroll containing information on all Wind Release Jutsu recorded inside up to A rank that allows the user to study and train to learn the Wind Jutsu that are recorded inside. Those without the user's permission cannot understand what is inside the scroll. 
+421.Earth Release Jutsu Scroll,5.5
+#Naruto - A large scroll containing information on all Earth Release Jutsu recorded inside up to A rank that allows the user to study and train to learn the Earth Jutsu that are recorded inside. Those without the user's permission cannot understand what is inside the scroll. 
+422.Lightning Release Jutsu Scroll,5.7
+#Naruto - A large scroll containing information on all Lightning Release Jutsu recorded inside up to A rank that allows the user to study and train to learn the Lightning Jutsu that are recorded inside. Those without the user's permission cannot understand what is inside the scroll. 
+423.T-51b Power Armor,2.6
+#Fallout - A set of power armour developed before the Great War and mass-produced for soldiers to wear. This power armour is strong enough to shrug off low-calibre bullets and allow the average man to lift a car overhead. The power armour is powered by a fusion core that gets replaced by a new one every 24 hours.
+424.Gene Seed Ticket,4.2
+#Warhammer 40k - A ticket that when ripped transports you to a room full of robotic surgeons that allow you to undergo the creation procedure of a Transhuman Astartes. This procedure is perfected and you will end up with the augments of an Astartes regardless without the downsides. This procedure will not affect your looks or the general shape of your body due to being perfected. 
+425.Justice's Shades,1.8
+#Helltaker - A pair of cool shades belonging to the blind demon. When wearing these shades you are able to tell when someone speaking to you thinks they are lying to you.
+426.E-11 medium blaster rifle,2.7
+#Star Wars - A standard issue arm of a Stormtrooper, these high-tech rifles shoot bolts of high heat energy that are strong enough to kill the average light armoured target in one shot and blast apart concrete. It has three settings Lethal, stun and sting and its cartridge holds 500 shots. You get a new cartridge every day.
+427.Soul Solid,2.4
+#One Piece - A cane sword belonging to Brook of the Straw Hat Pirates. This sword is extremely sharp and durable, not having dulled even after years of use. It is also extremely dapper.
+428.Wado Ichimonji,3.4
+#One Piece - A great-grade katana crafted by a master blacksmith in Wano. This sword is extremely sharp and absurdly durable, the perfect pick for any swordsman. In addition, this sword is great at channelling energy after years of use, making abilities using it as a channel cost slightly less energy.
+429.Tozama,1.7
+#JJK - A basic cursed tool in the form of a short sword. The sword sword is sharp and durable while also being able to interact with and harm spiritual beings.
+430.Split Soul Katana,5.6
+#JJK - A powerful cursed tool in the form of a large Japanese Broadsword. This sword is capable of cutting through all physical matter by ignoring durability to strike at the soul directly, inflicting wounds that cannot be healed by normal means.
