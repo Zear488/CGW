@@ -41,7 +41,11 @@ streamlit run Gacha_app.py
 Use PyInstaller to convert the app into an executable:
 
 ```bash
-pyinstaller --onefile --add-data "gachafiles;gachafiles" Gacha_app.py
+pyinstaller --onefile ^
+  --add-data "gachafiles;gachafiles" ^
+  --add-data "original_gacha;original_gacha" ^
+  --add-data "gacha_versions;gacha_versions" ^
+  Gacha_app.py
 ```
 
 > ⚠️ The `.txt` files in the `gachafiles/` folder are essential and must remain next to the `.exe` when distributing the app.
