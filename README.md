@@ -4,7 +4,7 @@ This repository contains a Streamlit application that simulates a gacha system w
 
 ---
 
-## 📁 Structure
+##  Structure
 
 ```
 Chaos_Gacha/
