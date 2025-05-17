@@ -295,7 +295,7 @@
 148.Lightning Channel,3.0
 #Allows you to channel lightning through any object you are holding, reinforcing and empowering them, this lightning imitates the object it is channelled through, becoming sharp with a sword and heavy with a hammer.
 149.Lightning Absorption,3.4
-#Allows you to absorb electricity and lightning and store it inside of your body. You can convert absorbed lightning into energy to refill your reserves or 
+#Allows you to absorb electricity and lightning and store it inside of your body. You can convert absorbed lightning into energy to refill your reserves or channel it to increase your power or use it as an attack.
 150. Call Lightning,2.8
 #Allows you to call down lightning that strikes from the sky to strike any location in your sensory range, not very effective indoors.
 151. Call Thunder,3.2
@@ -2002,4 +2002,8 @@ The harder a battle is, the stronger and faster you grow in the middle of it, al
 1000. Disillusioned,2.5
 #You can see through any kind of deception and physical concealment. You can see right through a pitfall as it is a deception etc. 
 1001. Piercing Eyes,2.1
-#Your eyes can see through objects, and you can adjust the level perfectly according to your needs.
+#Your eyes can see far and see through objects, and you can adjust the level perfectly according to your needs.
+1002.Dead Bone Pulse,4.9
+#Naruto - A Kekkei Genkai that allows the user to grow bones and bone constructs on and out of their body. In addition, the user can manipulate the shape of their bones and reinforce them by increasing their density. They can also manipulate their own skeleton to increase their defence.
+1003.All Killing Ash Bones,6.5
+#Naruto - All Killing Ash Bones allows the user to control their own skeleton and grow bone constructs out of their own body. They are able to reinforce these bones and if they manage to pierce the body of a living being they start deteriorating down to the molecular level until they die. The sure kill effect's potency is dependent on the power difference between the user and the target.

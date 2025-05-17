@@ -682,3 +682,17 @@
 #Race(Dragon Ball) - You are a Saiyan warrior, having a great natural physique and a monkey tail as a weakness. When exposed to a full moon you turn into a rampaging giant monkey with massively increased stats. Don't expect to be too strong too soon, even Goku needed decades of training from the greatest martial artists.
 345.Majin,7.3
 #Race(Dragon Ball) - You are a Majin, a descendant of Majin Buu, possessing a malleable gum-like physique with massively enhanced physical and magical stats. As a Majin you can survive and regenerate if even a handful of your body is left, in addition, you are able to absorb people and objects to strengthen yourself.
+346.Rodrigues,2.7
+#You are a Brazillian, but not only that, you are a descendant of the legendary Jetstream Sam. Not only do you have the Brazillian ability to double jump but you are also talented in swordsmanship and swordsmithing. 
+347.Tepes,3.8
+#You are a descendant of the legendary Tepes bloodline, the original vampires, or something like that. As a Tepes all Vampirism, Unholy and Hemokinetic abilities are more potent and all undead and vampires are more respectful towards you.
+348.Mithril Skeleton,4.1
+#Your skeleton is unusually durable, being able to take a lot of punishment before it suffers damage. In addition, it is flexible and conducts energy better. Note that your skeleton isn't real mithril and scales with your physical stats.
+349.Adamantium Skeleton,5.7
+#"Suck it Wolverine" Your skeleton is incredibly durable and dense, to the point where it seems nigh unbreakable. And unlike a certain angry small man, it doesn't poison you. Note that your skeleton isn't real adamantium and scales with your physical stats.
+350.Vibranium Skeleton,6.6
+#Your skeleton resembles Vibranium more than regular bone. Being nigh unbreakable and not only that, they are able to absorb and store kinetic energy that you can spend to enhance your physical strength temporarily.  Note that your skeleton isn't real Vibranium and scales with your physical stats.
+351.Adamantium Bonding,4.2
+#Marvel - Your Skeleton is bonded with Adamantium, making it borderline unbreakable but also severely poisons you. Unless you have countermeasures lined up you should wait before you activate this trait.
+352.Sensor,2.9
+#You have always had a knack for sensing and locating energy/mana/chakra etc. Your ability to sense and locate energy as well as your Thinker abilities are enhanced.
