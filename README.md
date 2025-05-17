@@ -1,10 +1,9 @@
-# Chaos Gacha App
+Chaos Gacha App
 
-Este repositorio contiene una aplicación Streamlit para simular un sistema de gacha con distintos niveles de rareza.
+This repository contains a Streamlit application that simulates a gacha system with different rarity levels.
 
-## Estructura
+Structure
 
-```
 Chaos_Gacha/
 ├── Gacha_app.py
 ├── gachafiles/
@@ -13,36 +12,37 @@ Chaos_Gacha/
 │   ├── familiar.txt
 │   ├── trait.txt
 │   └── skill.txt
-```
 
-## Uso
+Usage
 
-1. Asegúrate de tener Python 3.8 o superior.
-2. Instala Streamlit:
+1. Make sure you have Python 3.8 or higher.
+2. Install Streamlit:
 
-```bash
-pip install streamlit
-```
+   pip install streamlit
 
-3. Ejecuta la aplicación:
+3. Run the application:
 
-```bash
-streamlit run Gacha_app.py
-```
+   streamlit run Gacha_app.py
 
-## Empaquetar como .exe
+Packaging as .exe
 
-Usa PyInstaller para convertir la app en un ejecutable:
+Use PyInstaller to convert the app into an executable:
 
-```bash
-pyinstaller --onefile --add-data "gachafiles;gachafiles" Gacha_app.py
-```
+   pyinstaller --onefile --add-data "gachafiles;gachafiles" Gacha_app.py
 
-## Notas
+Notes
 
-- Los archivos `.txt` dentro de `gachafiles/` son esenciales y deben mantenerse junto al `.exe` si se distribuye como ejecutable.
+- The .txt files in the gachafiles/ folder are essential and must remain next to the .exe when distributing the app.
 
----
+Online Version
 
-### Credits
-This project was inspired by the original work of Bronzdeck.
+You can try the web version of this app hosted on Streamlit Cloud:  
+https://gachaapppy-9q6feaejxgdf4bbxwkkywx.streamlit.app/
+
+Credits
+
+This project was inspired by the original work of BronzDeck.  
+If you like this project, please consider supporting the original author on Patreon or visiting his GitHub repository:
+
+- Patreon: https://www.patreon.com/BronzDeck  
+- GitHub: https://github.com/Bronzdeck/ChaosGacha

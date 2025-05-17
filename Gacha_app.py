@@ -15,6 +15,7 @@ uploaded_file = st.sidebar.file_uploader("Upload history CSV (UTF-8)", type=["cs
 
 if "log" not in st.session_state:
     st.session_state["log"] = []
+    
 
 if uploaded_file:
     try:
@@ -301,9 +302,7 @@ if st.session_state.get("log"):
         mime="text/csv"
     )
 
-    import os
 from datetime import datetime
-import streamlit as st
 
 # Carpetas que usarás:
 # - "Original_gachafiles" para los archivos originales
@@ -383,42 +382,154 @@ if st.button("💾 Save Changes"):
 st.markdown("---")
 st.subheader("Saved Versions")
 
-# Listar versiones guardadas
+import base64
+
+st.markdown("## 📜 Saved Versions")
+
+version_folder = "gachafiles_versions"
+file_prefix = selected_gachafile + "_"
+
+# Buscar versiones guardadas del archivo actual
 version_files = sorted(
-    [f for f in os.listdir("gachafiles_versions") if f.startswith(selected_gachafile) and f.endswith(".txt")],
-    reverse=True,
+    [f for f in os.listdir(version_folder) if f.startswith(file_prefix)],
+    reverse=True
+    
 )
 
-for vf in version_files:
-    col1, col2 = st.columns([2,1])
-    with col1:
-        if st.button(f"Restore {vf}", key=f"restore_{vf}"):
-            with open(os.path.join("gachafiles_versions", vf), "r", encoding="utf-8") as f:
-                version_content = f.read()
-            st.session_state[edit_key] = version_content
-            st.session_state["edited_files"][selected_gachafile] = version_content
-            st.success(f"✅ Restored version: {vf}")
-            # No experimental_rerun, el cambio se refleja al actualizar textarea
-    with col2:
-        with open(os.path.join("gachafiles_versions", vf), "rb") as f:
-            st.download_button(
-                label="Download",
-                data=f,
-                file_name=vf,
-                mime="text/plain",
-                key=f"download_{vf}"
-            )
+if "editable_gachafiles" not in st.session_state:
+    st.session_state.editable_gachafiles = {}
+    
 
-# Guardar automáticamente todos los archivos editados al iniciar
-for fname in gachafile_options:
-    content_to_save = st.session_state["edited_files"].get(fname)
-    if content_to_save:
-        file_path = os.path.join("gachafiles", f"{fname}.txt")
-        with open(file_path, "w", encoding="utf-8") as f:
-            f.write(content_to_save)
+if version_files:
+    for version_file in version_files:
+        version_path = os.path.join(version_folder, version_file)
+        col1, col2, col3, col4 = st.columns([4, 1, 1, 1])
+        
+        with col1:
+            st.markdown(f"📂 `{version_file}`")
 
-        # Guardar versión automática con timestamp
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        version_path = os.path.join("gachafiles_versions", f"{fname}_{timestamp}.txt")
-        with open(version_path, "w", encoding="utf-8") as f:
-            f.write(content_to_save)
+        with col2:
+            if st.button("🔄 Restore", key=f"restore_{version_file}"):
+                with open(version_path, "r", encoding="utf-8") as f:
+                    st.session_state.editable_gachafiles[selected_gachafile] = f.read()
+                st.success(f"✅ Restored version: {version_file}")
+
+        with col3:
+            if st.button("🗑️ Delete", key=f"delete_{version_file}"):
+                try:
+                    os.remove(version_path)
+                    st.success(f"🗑️ Deleted version: {version_file}")
+                except Exception as e:
+                    st.error(f"❌ Error deleting version: {e}")
+
+        with col4:
+            with open(version_path, "rb") as f:
+                file_content = f.read()
+                b64 = base64.b64encode(file_content).decode()
+                href = f'<a href="data:file/txt;base64,{b64}" download="{version_file}">⬇️ Download</a>'
+                st.markdown(href, unsafe_allow_html=True)
+else:
+    st.info("No saved versions available for this file.")
+
+
+    st.markdown("## 🗑️ Manage Saved Versions")
+
+version_folder = "gachafiles_versions"
+
+if not os.path.exists(version_folder):
+    os.makedirs(version_folder)
+
+# -------------------------------
+# Borrar versiones del archivo actual
+# -------------------------------
+file_prefix = selected_gachafile + "_"
+version_files = [
+    f for f in os.listdir(version_folder)
+    if f.startswith(file_prefix) and f.endswith(".txt")
+]
+
+st.markdown("### 🔍 Delete Versions for Current File")
+
+if version_files:
+    selected_versions = st.multiselect(
+        "Select versions to delete:",
+        version_files,
+        help="These are saved historical versions of the current file."
+
+        
+    )
+    if st.button("❌ Delete Selected Versions"):
+        deleted = []
+        for vf in selected_versions:
+            try:
+                os.remove(os.path.join(version_folder, vf))
+                deleted.append(vf)
+            except Exception as e:
+                st.error(f"Failed to delete {vf}: {e}")
+        if deleted:
+            st.success(f"Deleted: {', '.join(deleted)}")
+        else:
+            st.warning("No versions were deleted.")
+else:
+    st.info("No saved versions available for this file.")
+
+# -------------------------------
+# Borrar TODAS las versiones guardadas
+# -------------------------------
+st.markdown("---")
+st.markdown("### 🧨 Delete All Versions (All Files)")
+
+all_versions = [
+    f for f in os.listdir(version_folder)
+    if f.endswith(".txt")
+]
+
+if all_versions:
+    if st.button("💣 Delete ALL Saved Versions (Irreversible)"):
+        try:
+            for f in all_versions:
+                os.remove(os.path.join(version_folder, f))
+            st.success("✅ All saved versions deleted.")
+        except Exception as e:
+            st.error(f"❌ Error deleting versions: {e}")
+
+            
+else:
+    st.info("There are no saved versions in the system.")
+    st.markdown("---")
+import re
+
+st.subheader("📤 Upload a Saved Version to Load")
+
+uploaded_version = st.file_uploader("Upload a saved version (.txt)", type=["txt"], key="upload_saved_version")
+
+if uploaded_version:
+    filename = uploaded_version.name
+    name_match = re.match(r"([A-Za-z]+)", filename)
+
+    if name_match:
+        base_name = name_match.group(1)
+
+        if base_name in gachafile_options:
+            uploaded_content = uploaded_version.read().decode("utf-8")
+
+            st.text_area(f"📄 Preview of '{filename}'", uploaded_content, height=200, key="uploaded_version_preview", disabled=True)
+
+            if st.button(f"📥 Cargar a 'Saved Versions' como nueva versión de '{base_name}'", key="load_uploaded_to_versions"):
+                # Guardar en historial de versiones
+                if base_name not in st.session_state["gachafiles_versions"]:
+                    st.session_state["gachafiles_versions"][base_name] = []
+
+                st.session_state["gachafiles_versions"][base_name].append(uploaded_content)
+
+                # También actualizar como archivo editable actual
+                st.session_state["edited_files"][base_name] = uploaded_content
+
+                st.success(f"✅ Archivo cargado como nueva versión de '{base_name}' y también actualizado como editable.")
+        else:
+            st.error(f"❌ Unknown file: '{base_name}' is not a valid gacha category.")
+    else:
+        st.error("❌ Invalid filename format. Use a file starting with the category name, like 'Item_*.txt'")
+
+        
+
