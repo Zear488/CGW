@@ -7,7 +7,7 @@ import re
 from streamlit.components.v1 import html
 
 # ------------------ CONFIG ------------------
-st.set_page_config(page_title="Chaos Gacha Web", layout="centered")
+st.set_page_config(page_title="Chaos Gacha Web", layout="wide")
 
 # ------------------ LOAD EXISTING HISTORY ------------------
 st.sidebar.header("📂 Load Previous History")
