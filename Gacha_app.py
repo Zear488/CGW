@@ -35,12 +35,9 @@ if st.sidebar.button("🗑️ Clear History"):
 def read_file_with_weight(filename, avg, min_val, max_val):
     elements, weights, rarities, descriptions = [], [], [], []
 
-    # Conversión de parámetros a float
     min_rarity = float(min_val)
     avg_rarity = float(avg)
     max_rarity = float(max_val)
-
-    # Selección aleatoria de tipo si se pasa "Random"
     if filename == "Random":
         filename = random.choice(["Ability", "Item", "Familiar", "Trait", "Skill"])
 
@@ -60,7 +57,7 @@ def read_file_with_weight(filename, avg, min_val, max_val):
                     try:
                         rarity = float(parts[1])
                     except ValueError:
-                        continue  # Saltar si la rareza no es válida
+                        continue  
 
                     elements.append(element)
                     rarities.append(rarity)
@@ -72,10 +69,8 @@ def read_file_with_weight(filename, avg, min_val, max_val):
                         descriptions.append(" ".join(temp_description).strip())
                         temp_description = []
             else:
-                # Acumular línea como parte de la descripción
                 temp_description.append(line)
 
-        # Añadir última descripción si quedó pendiente
         if temp_description:
             descriptions.append(" ".join(temp_description).strip())
 
@@ -91,9 +86,8 @@ def randomizer(min_val, max_val, avg, exponent=6):
     randarr = []
     weights = []
 
-    # Aumentamos chance de valores promedio
     extended_max = max_val
-    if random.random() < 0.003:  # aún más raro extender el máximo
+    if random.random() < 0.003:  # 
         extended_max = min(12.0, max_val + 1.5)
 
     x = min_val
