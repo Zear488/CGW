@@ -62,7 +62,7 @@ def read_file_with_weight(filename, avg, min_val, max_val):
 
                     elements.append(element)
                     rarities.append(rarity)
-                    weight = 1 / (pow(4, abs(avg_rarity - rarity)))
+                    weight = 1 / (pow(5, abs(avg_rarity - rarity)))
                     weights.append(weight)
 
                     # Guardar la descripción acumulada, si existe
@@ -79,49 +79,79 @@ def read_file_with_weight(filename, avg, min_val, max_val):
 
     return elements, weights, rarities, descriptions, weightsum, chosentype
 # ------------------ GACHA FUNCTIONS ------------------
-def randomizer(min_val, max_val, avg, std_dev=0.8):
+
+def randomizer(min_val, max_val, avg, rarity_values, std_dev=0.8, max_retries=10, penalty_step=0.07, bonus_chance=0.0048, bonus_max=2.0):
     min_val = float(min_val)
     max_val = float(max_val)
     avg = float(avg)
-    while True:
-        rarity = random.gauss(avg, std_dev)
-        if min_val <= rarity <= max_val:
-            return round(rarity, 2)
+    
+    rarity = random.gauss(avg, std_dev)
+    rarity = max(min(rarity, max_val), min_val)
+    rarity = round(rarity, 2)
+
+    retry_count = 0
+    current_max = rarity
+
+    # Intentar encontrar un ítem compatible, con penalización progresiva
+    while retry_count < max_retries:
+        matching_items = [item for item in rarity_values if abs(item['rarity'] - rarity) < 0.01]
+        if matching_items:
+            break
+        penalty = penalty_step * (retry_count + 1)
+        current_max = max(min_val, rarity * (1 - penalty))
+        rarity = round(random.uniform(min_val, current_max), 2)
+        retry_count += 1
+
+    # Bonus aleatorio (chance del 0.48%)
+    if random.random() < bonus_chance:
+        rarity = min(max_val, round(rarity + random.uniform(0.1, bonus_max), 2))
+
+    return rarity
+    
 
 
 def run_gacha(mode, min_val, avg, max_val, max_tries=10):
     elements, base_weights, rarities, descriptions, _, chosentype = read_file_with_weight(mode, avg, min_val, max_val)
 
+    std_dev = 0.8
+    penalty_step = 0.07  
+    bonus_chance = 0.0048  # 0.48%
+    bonus_max = 2.0  
+
+    rarity = random.gauss(avg, std_dev)
+    rarity = max(min(rarity, max_val), min_val)
+    rarity = round(rarity, 2)
+
     for attempt in range(1, max_tries + 1):
-        raritypull = randomizer(min_val, max_val, avg, std_dev=0.8)
+        if random.random() < bonus_chance:
+            rarity = min(max_val, round(rarity + random.uniform(0.1, bonus_max), 2))
 
         filtered = [(e, w, r, d) for e, w, r, d in zip(elements, base_weights, rarities, descriptions)
-                    if abs(r - raritypull) <= 0.25]
-
+                    if abs(r - rarity) <= 0.25]
         if filtered:
             adjusted_weights = [w for _, w, _, _ in filtered]
             filtered_weights_sum = sum(adjusted_weights)
             if filtered_weights_sum == 0:
                 return None
-
             selected = random.choices(filtered, weights=adjusted_weights)[0]
-            element, _, rarity, desc = selected
+            element, _, rarity_found, desc = selected
 
-            # Estimated Luck ahora se basa en la distancia al valor promedio
-            deviation = abs(rarity - avg)
+            deviation = abs(rarity_found - avg)
             rarity_range = max_val - min_val
             normalized_deviation = deviation / (rarity_range / 2)
-
-            estimated_luck = (1 - normalized_deviation) * 100  # Más lejos del promedio = más suerte
-            estimated_luck = max(0.1, min(estimated_luck, 100))  # Limitar valores extremos
+            estimated_luck = (1 - normalized_deviation) * 100
+            estimated_luck = max(0.1, min(estimated_luck, 100))
 
             return {
                 "element": element,
-                "rarity": rarity,
+                "rarity": rarity_found,
                 "description": desc.replace("#", "").strip(),
                 "luck": round(estimated_luck, 2),
                 "type": chosentype
             }
+        penalty = penalty_step * attempt
+        upper_limit = max(min_val, rarity * (1 - penalty))
+        rarity = round(random.uniform(min_val, upper_limit), 2)
 
     return None
 
