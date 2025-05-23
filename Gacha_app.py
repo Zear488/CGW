@@ -6,6 +6,7 @@ import os
 import re
 from streamlit.components.v1 import html
 import numpy as np
+import math
 
 # ------------------ CONFIG ------------------
 st.set_page_config(page_title="Chaos Gacha Web", layout="wide")
@@ -39,6 +40,8 @@ def read_file_with_weight(filename, avg, min_val, max_val):
     min_rarity = float(min_val)
     avg_rarity = float(avg)
     max_rarity = float(max_val)
+    sigma = 1.2  # Puedes hacerlo ajustable desde el preset si lo deseas
+
     if filename == "Random":
         filename = random.choice(["Ability", "Item", "Familiar", "Trait", "Skill"])
 
@@ -49,7 +52,6 @@ def read_file_with_weight(filename, avg, min_val, max_val):
         temp_description = []
 
         for line in file:
-            # Detectar si es una línea válida (con formato de ítem)
             match = re.match(r"^(\d+)\.(\S*)\s*(.*)", line)
             if match:
                 parts = line.strip().split(",")
@@ -58,14 +60,15 @@ def read_file_with_weight(filename, avg, min_val, max_val):
                     try:
                         rarity = float(parts[1])
                     except ValueError:
-                        continue  
+                        continue
 
                     elements.append(element)
                     rarities.append(rarity)
-                    weight = 1 / (pow(5, abs(avg_rarity - rarity)))
+
+                    # Nuevo peso basado en distribución gaussiana centrada en avg
+                    weight = math.exp(-((rarity - avg_rarity) ** 2) / (2 * sigma ** 2))
                     weights.append(weight)
 
-                    # Guardar la descripción acumulada, si existe
                     if temp_description:
                         descriptions.append(" ".join(temp_description).strip())
                         temp_description = []
@@ -80,36 +83,30 @@ def read_file_with_weight(filename, avg, min_val, max_val):
     return elements, weights, rarities, descriptions, weightsum, chosentype
 # ------------------ GACHA FUNCTIONS ------------------
 
-def randomizer(min_val, max_val, avg, rarity_values, std_dev=0.8, max_retries=10, penalty_step=0.07, bonus_chance=0.0048, bonus_max=2.0):
+def randomizer(min_val, max_val, avg, std_dev=0.8, bonus_chance=0.0048, bonus_max=2.0, max_penalty=0.7, max_attempts=10):
     min_val = float(min_val)
     max_val = float(max_val)
     avg = float(avg)
+
+    for attempt in range(1, max_attempts + 1):
+        # Penalización progresiva al promedio para permitir encontrar algo cercano
+        penalty_factor = 1 - min(max_penalty, (attempt - 1) * 0.07)  # Límite: -70%
+        capped_avg = avg * penalty_factor
+        rarity = random.gauss(capped_avg, std_dev)
+
+        # Bonus de rareza ocasional
+        if random.random() < bonus_chance:
+            rarity += random.uniform(0.1, bonus_max)
+
+        # Clampeamos dentro de los límites
+        rarity = max(min_val, min(rarity, max_val))
+
+        if min_val <= rarity <= max_val:
+            return round(rarity, 2)
+
+    # Si falla todo, retorna el peor resultado
+    return round(min_val, 2)
     
-    rarity = random.gauss(avg, std_dev)
-    rarity = max(min(rarity, max_val), min_val)
-    rarity = round(rarity, 2)
-
-    retry_count = 0
-    current_max = rarity
-
-    # Intentar encontrar un ítem compatible, con penalización progresiva
-    while retry_count < max_retries:
-        matching_items = [item for item in rarity_values if abs(item['rarity'] - rarity) < 0.01]
-        if matching_items:
-            break
-        penalty = penalty_step * (retry_count + 1)
-        current_max = max(min_val, rarity * (1 - penalty))
-        rarity = round(random.uniform(min_val, current_max), 2)
-        retry_count += 1
-
-    # Bonus aleatorio (chance del 0.48%)
-    if random.random() < bonus_chance:
-        rarity = min(max_val, round(rarity + random.uniform(0.1, bonus_max), 2))
-
-    return rarity
-    
-
-
 def run_gacha(mode, min_val, avg, max_val, max_tries=10):
     elements, base_weights, rarities, descriptions, _, chosentype = read_file_with_weight(mode, avg, min_val, max_val)
 
@@ -136,11 +133,11 @@ def run_gacha(mode, min_val, avg, max_val, max_tries=10):
             selected = random.choices(filtered, weights=adjusted_weights)[0]
             element, _, rarity_found, desc = selected
 
-            deviation = abs(rarity_found - avg)
+            deviation = rarity - min_val
             rarity_range = max_val - min_val
-            normalized_deviation = deviation / (rarity_range / 2)
-            estimated_luck = (1 - normalized_deviation) * 100
-            estimated_luck = max(0.1, min(estimated_luck, 100))
+            estimated_luck = (1 - (deviation / rarity_range)) * 100  # Más cerca del min = 100%, más cerca del max = 0%
+
+            estimated_luck = max(0.1, min(estimated_luck, 100)) 
 
             return {
                 "element": element,
@@ -206,10 +203,6 @@ with st.expander("ℹ️ What do 'Rarity' and 'Estimated Luck' mean?"):
     | < 1%           | Extremely Rare / Epic Pull |
 
     The lower the percentage, the luckier you were. 
-    Take note that the average represents what will usually come up. 
-    This means that even if a value is the minimum, 
-    it doesn't mean it's something that commonly appears.
-
     This value is calculated based on the rarity and the configured search range.
     """)
 
@@ -269,17 +262,17 @@ pull_count = st.selectbox("Select number of pulls:", [1, 2, 5, 10], index=0)
 
 # Función para clasificar Estimated Luck
 def classify_luck(luck_value):
-    if luck_value > 80:
+    if luck_value > 95:
         return "Below Average"
-    elif luck_value > 55:
+    elif luck_value > 75:
         return "Average"
-    elif luck_value > 15:
+    elif luck_value > 55:
         return "Above Average"
-    elif luck_value > 5:
+    elif luck_value > 35:
         return "Notable"
-    elif luck_value > 1:
+    elif luck_value > 15:
         return "Rare"
-    elif luck_value > 0.85:
+    elif luck_value > 5:
         return "Exceptional Pull"
     else:
         return "Mythic Pull"
