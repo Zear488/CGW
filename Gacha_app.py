@@ -40,7 +40,7 @@ def read_file_with_weight(filename, avg, min_val, max_val):
     min_rarity = float(min_val)
     avg_rarity = float(avg)
     max_rarity = float(max_val)
-    sigma = 1.2  # Puedes hacerlo ajustable desde el preset si lo deseas
+    sigma = 1.2  
 
     if filename == "Random":
         filename = random.choice(["Ability", "Item", "Familiar", "Trait", "Skill"])
@@ -103,52 +103,49 @@ def randomizer(min_val, max_val, avg, std_dev=0.8, bonus_chance=0.0048, bonus_ma
 
         if min_val <= rarity <= max_val:
             return round(rarity, 2)
-
     # Si falla todo, retorna el peor resultado
     return round(min_val, 2)
     
 def run_gacha(mode, min_val, avg, max_val, max_tries=10):
     elements, base_weights, rarities, descriptions, _, chosentype = read_file_with_weight(mode, avg, min_val, max_val)
 
-    std_dev = 0.8
-    penalty_step = 0.07  
-    bonus_chance = 0.0048  # 0.48%
-    bonus_max = 2.0  
-
-    rarity = random.gauss(avg, std_dev)
-    rarity = max(min(rarity, max_val), min_val)
-    rarity = round(rarity, 2)
-
     for attempt in range(1, max_tries + 1):
-        if random.random() < bonus_chance:
-            rarity = min(max_val, round(rarity + random.uniform(0.1, bonus_max), 2))
+        raritypull = randomizer(min_val, max_val, avg, std_dev=0.8)
 
         filtered = [(e, w, r, d) for e, w, r, d in zip(elements, base_weights, rarities, descriptions)
-                    if abs(r - rarity) <= 0.25]
+                    if abs(r - raritypull) <= 0.25]
+
         if filtered:
             adjusted_weights = [w for _, w, _, _ in filtered]
             filtered_weights_sum = sum(adjusted_weights)
             if filtered_weights_sum == 0:
                 return None
+
             selected = random.choices(filtered, weights=adjusted_weights)[0]
-            element, _, rarity_found, desc = selected
+            element, _, rarity, desc = selected
 
-            deviation = rarity - min_val
+            bonus_triggered = False
+            # BONUS: 0.48% de probabilidad de +2 de rareza si no supera el máximo
+            if random.random() < 0.0048 and rarity + 2 <= max_val:
+                rarity += 2
+                element = f"★ {element}"
+                bonus_triggered = True
+
             rarity_range = max_val - min_val
-            estimated_luck = (1 - (deviation / rarity_range)) * 100  # Más cerca del min = 100%, más cerca del max = 0%
-
-            estimated_luck = max(0.1, min(estimated_luck, 100)) 
+            if rarity_range == 0:
+                estimated_luck = 100.0
+            else:
+                distance_from_min = rarity - min_val
+                estimated_luck = max(0.1, min(100.0, 100.0 * (1 - (distance_from_min / rarity_range))))
 
             return {
                 "element": element,
-                "rarity": rarity_found,
+                "rarity": round(rarity, 2),
                 "description": desc.replace("#", "").strip(),
                 "luck": round(estimated_luck, 2),
-                "type": chosentype
+                "type": chosentype,
+                "bonus": bonus_triggered
             }
-        penalty = penalty_step * attempt
-        upper_limit = max(min_val, rarity * (1 - penalty))
-        rarity = round(random.uniform(min_val, upper_limit), 2)
 
     return None
 
@@ -260,7 +257,6 @@ st.session_state["max_val"] = max_val
 # Selector de multipull
 pull_count = st.selectbox("Select number of pulls:", [1, 2, 5, 10], index=0)
 
-# Función para clasificar Estimated Luck
 def classify_luck(luck_value):
     if luck_value > 95:
         return "Below Average"
