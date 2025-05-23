@@ -34,56 +34,84 @@ if st.sidebar.button("🗑️ Clear History"):
 # ------------------ READ FUNCTION ------------------
 def read_file_with_weight(filename, avg, min_val, max_val):
     elements, weights, rarities, descriptions = [], [], [], []
+
+    # Conversión de parámetros a float
     min_rarity = float(min_val)
     avg_rarity = float(avg)
     max_rarity = float(max_val)
 
+    # Selección aleatoria de tipo si se pasa "Random"
     if filename == "Random":
         filename = random.choice(["Ability", "Item", "Familiar", "Trait", "Skill"])
+
     chosentype = filename.capitalize()
     path = os.path.join("gachafiles", f"{filename}.txt")
 
     with open(path, "r", encoding="utf-8") as file:
-        tempdescription = []
+        temp_description = []
+
         for line in file:
+            # Detectar si es una línea válida (con formato de ítem)
             match = re.match(r"^(\d+)\.(\S*)\s*(.*)", line)
             if match:
                 parts = line.strip().split(",")
-                element, rarity = parts[0], float(parts[1])
-                elements.append(element)
-                weight = 1 / (pow(4, abs(avg_rarity - rarity)))
-                weights.append(weight)
-                rarities.append(rarity)
-                if tempdescription:
-                    descriptions.append(" ".join(tempdescription).strip())
-                    tempdescription = []
-            else:
-                tempdescription.append(line)
-        if tempdescription:
-            descriptions.append(" ".join(tempdescription).strip())
+                if len(parts) >= 2:
+                    element = parts[0].strip()
+                    try:
+                        rarity = float(parts[1])
+                    except ValueError:
+                        continue  # Saltar si la rareza no es válida
 
-    weightsum = sum(weights)  # Sum ALL weights here, not filtered subset
+                    elements.append(element)
+                    rarities.append(rarity)
+                    weight = 1 / (pow(4, abs(avg_rarity - rarity)))
+                    weights.append(weight)
+
+                    # Guardar la descripción acumulada, si existe
+                    if temp_description:
+                        descriptions.append(" ".join(temp_description).strip())
+                        temp_description = []
+            else:
+                # Acumular línea como parte de la descripción
+                temp_description.append(line)
+
+        # Añadir última descripción si quedó pendiente
+        if temp_description:
+            descriptions.append(" ".join(temp_description).strip())
+
+    weightsum = sum(weights)
 
     return elements, weights, rarities, descriptions, weightsum, chosentype
-
 # ------------------ GACHA FUNCTIONS ------------------
-def randomizer(min_val, max_val, avg, exponent):
+def randomizer(min_val, max_val, avg, exponent=6):
     min_val = float(min_val)
     max_val = float(max_val)
     avg = float(avg)
+
     randarr = []
     weights = []
 
+    # Aumentamos chance de valores promedio
+    extended_max = max_val
+    if random.random() < 0.003:  # aún más raro extender el máximo
+        extended_max = min(12.0, max_val + 1.5)
+
     x = min_val
-    while x < max_val:
+    while x <= extended_max:
         randarr.append(round(x, 2))
-        weights.append(1 / (pow(float(exponent), abs(avg - x))))
+
+        # Penalización más severa por alejarse del promedio
+        diff = abs(avg - x)
+        modifier = 1.0
+        if x < min_val or x > max_val:
+            modifier = 0.2  # penaliza fuera de rango
+        weights.append(modifier * (1 / pow(exponent, diff)))
         x += 0.1
 
     if not randarr or not weights:
         return avg
 
-    rarity = random.choices(randarr, weights)[0] + 0.1
+    rarity = random.choices(randarr, weights=weights)[0]
     return float(rarity)
 
 def run_gacha(mode, min_val, avg, max_val, max_tries=10):
@@ -100,19 +128,24 @@ def run_gacha(mode, min_val, avg, max_val, max_tries=10):
 
             filtered_weights_sum = sum(w for _, w, _, _ in filtered)
             if filtered_weights_sum == 0:
-                st.error("❌ Internal error: division by zero (filtered weights sum is zero).")
+                st.warning("⚠️ No available pulls for this rarity range. Try widening your range or adding higher-tier elements.")
                 return None
 
             selected = random.choices(filtered, weights=adjusted_weights)[0]
             element, weight, rarity, desc = selected
             luckpercentage = 100 * weight / filtered_weights_sum
 
+            rarity_deviation = abs(rarity - avg)
+            luck_multiplier = pow(1.5, rarity_deviation)  # Mayor rareza => menor suerte percibida
+
+            adjusted_luck = luckpercentage / luck_multiplier
+
             return {
                 "element": element,
                 "rarity": rarity,
                 "description": desc.replace("#", "").strip(),
-                "luck": round(luckpercentage * penalty, 2),
-                "type": chosentype
+                "luck": round(adjusted_luck * penalty, 2),
+                 "type": chosentype
             }
 
     return None
@@ -221,35 +254,74 @@ st.session_state["min_val"] = min_val
 st.session_state["avg"] = avg
 st.session_state["max_val"] = max_val
 
-if st.button("🎰 Roll", type="primary"):
-    result = run_gacha(mode, min_val, avg, max_val)
+# Selector + Botón de Multi Pull
+# Selector de multipull
+pull_count = st.selectbox("Select number of pulls:", [1, 2, 5, 10], index=0)
 
-    if result:
-        tier, color = get_tier_and_color(result["rarity"])
-        st.markdown(f"<h3 style='color:{color}' title='{result['description']}'>🎉 {result['element']}</h3>", unsafe_allow_html=True)
-        st.markdown(f"<span style='color:{color}'><strong>Rarity</strong>: `{result['rarity']:.2f}` ({tier})</span>", unsafe_allow_html=True)
-        st.markdown(f"<span style='color:{color}'><strong>Type</strong>: `{result['type']}`</span>", unsafe_allow_html=True)
-        st.markdown(f"<span style='color:{color}'><strong>Estimated Luck</strong>: `{result['luck']:.2f}%`</span>", unsafe_allow_html=True)
-        st.markdown("---")
-        st.markdown(f"<div style='background-color:#111;padding:10px;border-radius:10px;'>"
-                    f"<p style='color:white;font-size:16px;line-height:1.5;text-align:justify;'>{result['description']}</p>"
-                    f"</div>", unsafe_allow_html=True)
-
-        st.session_state["log"].append({
-            "Type": result["type"],
-            "Element": result["element"],
-            "Rarity": f"{result['rarity']:.2f}",
-            "Tier": tier,
-            "Luck": f"{result['luck']:.2f}%",
-            "Description": result["description"],
-            "Color": color
-        })
+# Función para clasificar Estimated Luck
+def classify_luck(luck_value):
+    if luck_value > 80:
+        return "Trash Tier Pull"
+    elif luck_value > 55:
+        return "Common Pull"
+    elif luck_value > 15:
+        return "Uncommon Pull"
+    elif luck_value > 5:
+        return "Rare Pull"
+    elif luck_value > 1:
+        return "Epic Pull"
+    elif luck_value > 0.85:
+        return "Legendary Pull"
     else:
-        st.warning("No valid result found. Try adjusting the rarity range.")
+        return "Transcendent Pull"
+
+# Función para mostrar un resultado
+def display_result(result, min_val, max_val):
+    tier, color = get_tier_and_color(result["rarity"])
+    luck_type = classify_luck(result["luck"])
+
+    st.markdown(f"<h3 style='color:{color}' title='{result['description']}'>🎉 {result['element']}</h3>", unsafe_allow_html=True)
+    st.markdown(f"<span style='color:{color}'><strong>Rarity</strong>: `{result['rarity']:.2f}` ({tier})</span>", unsafe_allow_html=True)
+    st.markdown(f"<span style='color:{color}'><strong>Type</strong>: `{result['type']}`</span>", unsafe_allow_html=True)
+    st.markdown(f"<span style='color:{color}'><strong>Estimated Luck</strong>: `{result['luck']:.2f}%` – {luck_type}</span>", unsafe_allow_html=True)
+    st.markdown("---")
+    st.markdown(
+        f"<div style='background-color:#111;padding:10px;border-radius:10px;'>"
+        f"<p style='color:white;font-size:16px;line-height:1.5;text-align:justify;'>{result['description']}</p>"
+        f"</div>",
+        unsafe_allow_html=True
+    )
+
+    # Registrar en el historial
+    st.session_state["log"].append({
+        "Type": result["type"],
+        "Element": result["element"],
+        "Rarity": f"{result['rarity']:.2f}",
+        "Tier": tier,
+        "Luck": f"{result['luck']:.2f}%",
+        "Description": result["description"],
+        "Color": color
+    })
+
+# Botón individual 🎰 Roll
+if st.button("🎰 Roll"):
+    result = run_gacha(mode, min_val, avg, max_val)
+    if result:
+        display_result(result, min_val, max_val)
+
+# Botón de Multi-Roll
+if st.button("🎲 Multi-Roll"):
+    results = [run_gacha(mode, min_val, avg, max_val) for _ in range(pull_count)]
+    for result in results:
+        if result:
+            display_result(result, min_val, max_val)
+
 
 if st.session_state.get("log"):
     st.markdown("## 📜 Roll History")
     st.markdown(f"Total Rolls: **{len(st.session_state['log'])}**")
+
+    
 
     # Mostrar historial como HTML
     log_html = """
