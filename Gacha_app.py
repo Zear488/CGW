@@ -320,8 +320,6 @@ if st.session_state.get("log"):
     st.markdown("## 📜 Roll History")
     st.markdown(f"Total Rolls: **{len(st.session_state['log'])}**")
 
-    
-
     # Mostrar historial como HTML
     log_html = """
     <div style='
@@ -474,7 +472,6 @@ version_files = sorted(
 if "editable_gachafiles" not in st.session_state:
     st.session_state.editable_gachafiles = {}
     
-
 if version_files:
     for version_file in version_files:
         version_path = os.path.join(version_folder, version_file)
