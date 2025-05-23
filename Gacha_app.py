@@ -5,6 +5,7 @@ import random
 import os
 import re
 from streamlit.components.v1 import html
+import numpy as np
 
 # ------------------ CONFIG ------------------
 st.set_page_config(page_title="Chaos Gacha Web", layout="wide")
@@ -78,68 +79,48 @@ def read_file_with_weight(filename, avg, min_val, max_val):
 
     return elements, weights, rarities, descriptions, weightsum, chosentype
 # ------------------ GACHA FUNCTIONS ------------------
-def randomizer(min_val, max_val, avg, exponent=6):
+def randomizer(min_val, max_val, avg, std_dev=0.8):
     min_val = float(min_val)
     max_val = float(max_val)
     avg = float(avg)
+    while True:
+        rarity = random.gauss(avg, std_dev)
+        if min_val <= rarity <= max_val:
+            return round(rarity, 2)
 
-    randarr = []
-    weights = []
-
-    extended_max = max_val
-    if random.random() < 0.003:  # 
-        extended_max = min(12.0, max_val + 1.5)
-
-    x = min_val
-    while x <= extended_max:
-        randarr.append(round(x, 2))
-
-        # Penalización más severa por alejarse del promedio
-        diff = abs(avg - x)
-        modifier = 1.0
-        if x < min_val or x > max_val:
-            modifier = 0.2  # penaliza fuera de rango
-        weights.append(modifier * (1 / pow(exponent, diff)))
-        x += 0.1
-
-    if not randarr or not weights:
-        return avg
-
-    rarity = random.choices(randarr, weights=weights)[0]
-    return float(rarity)
 
 def run_gacha(mode, min_val, avg, max_val, max_tries=10):
     elements, base_weights, rarities, descriptions, _, chosentype = read_file_with_weight(mode, avg, min_val, max_val)
 
     for attempt in range(1, max_tries + 1):
-        raritypull = randomizer(min_val, max_val, avg, 4)
+        raritypull = randomizer(min_val, max_val, avg, std_dev=0.8)
+
         filtered = [(e, w, r, d) for e, w, r, d in zip(elements, base_weights, rarities, descriptions)
-                    if abs(r - raritypull) <= 0.2]
+                    if abs(r - raritypull) <= 0.25]
 
         if filtered:
-            penalty = max(1.0 - ((attempt - 1) * 0.05), 0.7)
-            adjusted_weights = [w * penalty for _, w, _, _ in filtered]
-
-            filtered_weights_sum = sum(w for _, w, _, _ in filtered)
+            adjusted_weights = [w for _, w, _, _ in filtered]
+            filtered_weights_sum = sum(adjusted_weights)
             if filtered_weights_sum == 0:
-                st.warning("⚠️ No available pulls for this rarity range. Try widening your range or adding higher-tier elements.")
                 return None
 
             selected = random.choices(filtered, weights=adjusted_weights)[0]
-            element, weight, rarity, desc = selected
-            luckpercentage = 100 * weight / filtered_weights_sum
+            element, _, rarity, desc = selected
 
-            rarity_deviation = abs(rarity - avg)
-            luck_multiplier = pow(1.5, rarity_deviation)  # Mayor rareza => menor suerte percibida
+            # Estimated Luck ahora se basa en la distancia al valor promedio
+            deviation = abs(rarity - avg)
+            rarity_range = max_val - min_val
+            normalized_deviation = deviation / (rarity_range / 2)
 
-            adjusted_luck = luckpercentage / luck_multiplier
+            estimated_luck = (1 - normalized_deviation) * 100  # Más lejos del promedio = más suerte
+            estimated_luck = max(0.1, min(estimated_luck, 100))  # Limitar valores extremos
 
             return {
                 "element": element,
                 "rarity": rarity,
                 "description": desc.replace("#", "").strip(),
-                "luck": round(adjusted_luck * penalty, 2),
-                 "type": chosentype
+                "luck": round(estimated_luck, 2),
+                "type": chosentype
             }
 
     return None
@@ -167,7 +148,8 @@ st.title("🎲 Chaos Gacha Web")
 
 with st.expander("ℹ️ What do 'Rarity' and 'Estimated Luck' mean?"):
     st.markdown("""
-    **🧪 Rarity** is a value between `0.1` and `10.0` that represents how special or powerful an element is. The higher the number, the rarer it is.
+    **🧪 Rarity** is a value between `0.1` and `10.0` that represents 
+    how special or powerful an element is. The higher the number, the rarer it is.
 
     | Tier           | Rarity Range   | Color        |
     |----------------|----------------|--------------|
@@ -193,7 +175,10 @@ with st.expander("ℹ️ What do 'Rarity' and 'Estimated Luck' mean?"):
     | 1% – 10%       | Rare                       |
     | < 1%           | Extremely Rare / Epic Pull |
 
-    The lower the percentage, the luckier you were.
+    The lower the percentage, the luckier you were. 
+    Take note that the average represents what will usually come up. 
+    This means that even if a value is the minimum, 
+    it doesn't mean it's something that commonly appears.
 
     This value is calculated based on the rarity and the configured search range.
     """)
@@ -255,19 +240,19 @@ pull_count = st.selectbox("Select number of pulls:", [1, 2, 5, 10], index=0)
 # Función para clasificar Estimated Luck
 def classify_luck(luck_value):
     if luck_value > 80:
-        return "Trash Tier Pull"
+        return "Below Average"
     elif luck_value > 55:
-        return "Common Pull"
+        return "Average"
     elif luck_value > 15:
-        return "Uncommon Pull"
+        return "Above Average"
     elif luck_value > 5:
-        return "Rare Pull"
+        return "Notable"
     elif luck_value > 1:
-        return "Epic Pull"
+        return "Rare"
     elif luck_value > 0.85:
-        return "Legendary Pull"
+        return "Exceptional Pull"
     else:
-        return "Transcendent Pull"
+        return "Mythic Pull"
 
 # Función para mostrar un resultado
 def display_result(result, min_val, max_val):
