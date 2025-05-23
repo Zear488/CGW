@@ -126,7 +126,7 @@ def run_gacha(mode, min_val, avg, max_val, max_tries=10):
 
             bonus_triggered = False
             # BONUS: 0.48% de probabilidad de +2 de rareza si no supera el máximo
-            if random.random() < 0.0048 and rarity + 2 <= max_val:
+            if random.random() < 0.0048 and rarity + 2 <= 10:
                 rarity += 2
                 element = f"★ {element}"
                 bonus_triggered = True
@@ -298,7 +298,8 @@ def display_result(result, min_val, max_val):
         "Tier": tier,
         "Luck": f"{result['luck']:.2f}%",
         "Description": result["description"],
-        "Color": color
+        "Color": color,
+        "Bonus": "★" if result.get("bonus") else ""
     })
 
 # Botón individual 🎰 Roll
