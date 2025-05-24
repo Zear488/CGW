@@ -83,90 +83,34 @@ def read_file_with_weight(filename, avg, min_val, max_val):
     return elements, weights, rarities, descriptions, weightsum, chosentype
 # ------------------ GACHA FUNCTIONS ------------------
 
-rarity_points = {
-    "Trash": 0,
-    "Common": 0.001,
-    "Uncommon": 0.003,
-    "Rare": 0.009,
-    "Elite": 0.025,
-    "Epic": 0.075,
-    "Legendary": 0.225,
-    "Mythical": 0.675,
-    "Divine": 2.025,
-    "Transcendent": 6.075
-}
-
-# Inicializar puntos acumulados
-if "transcendent_points" not in st.session_state:
-    st.session_state["transcendent_points"] = 0.0
-
-# Función para verificar duplicados y asignar puntos
-def check_duplicates_and_assign_points(new_element, tier):
-    for entry in st.session_state["log"]:
-        if entry["Element"] == new_element:
-            points = rarity_points.get(tier, 0)
-            st.session_state["transcendent_points"] += points
-            return points
-    return 0
-
-# ------------------ APLICACIÓN DE PUNTOS A UNA TIRADA ------------------
-
-# Función para aplicar puntos a una tirada
-def apply_points_to_roll(points_to_use):
-    if points_to_use > st.session_state["transcendent_points"]:
-        st.warning("No tienes suficientes puntos trascendentes.")
-        return False
-    st.session_state["transcendent_points"] -= points_to_use
-    return True
-
-st.sidebar.subheader("✨ Puntos Trascendentes")
-st.sidebar.markdown(f"**Disponibles:** {st.session_state['transcendent_points']:.3f}")
-
-# Entrada para aplicar puntos
-points_input = st.sidebar.number_input("Puntos a aplicar en la siguiente tirada:", min_value=0.0, max_value=st.session_state["transcendent_points"], step=0.001, format="%.3f")
-apply_points = st.sidebar.button("Aplicar puntos a la siguiente tirada")
-
-if apply_points:
-    if apply_points_to_roll(points_input):
-        st.session_state["points_applied"] = points_input
-        st.success(f"Se aplicarán {points_input:.3f} puntos en la siguiente tirada.")
-    else:
-        st.session_state["points_applied"] = 0.0
-else:
-    st.session_state["points_applied"] = 0.0
-
-
-def randomizer(min_val, max_val, avg, std_dev=0.8, bonus_chance=0.0048, bonus_max=2.0, max_penalty=0.7, max_attempts=10, extra_bonus=0.0):
+def randomizer(min_val, max_val, avg, std_dev=0.8, bonus_chance=0.0048, bonus_max=2.0, max_penalty=0.7, max_attempts=10):
     min_val = float(min_val)
     max_val = float(max_val)
     avg = float(avg)
 
     for attempt in range(1, max_attempts + 1):
-        penalty_factor = 1 - min(max_penalty, (attempt - 1) * 0.07)
+        # Penalización progresiva al promedio para permitir encontrar algo cercano
+        penalty_factor = 1 - min(max_penalty, (attempt - 1) * 0.07)  # Límite: -70%
         capped_avg = avg * penalty_factor
         rarity = random.gauss(capped_avg, std_dev)
 
         # Bonus de rareza ocasional
-        if random.random() < bonus_chance + extra_bonus:
+        if random.random() < bonus_chance:
             rarity += random.uniform(0.1, bonus_max)
 
+        # Clampeamos dentro de los límites
         rarity = max(min_val, min(rarity, max_val))
 
         if min_val <= rarity <= max_val:
             return round(rarity, 2)
+    # Si falla todo, retorna el peor resultado
     return round(min_val, 2)
     
-def run_gacha(mode, min_val, avg, max_val, max_tries=10, use_points=False):
+def run_gacha(mode, min_val, avg, max_val, max_tries=10):
     elements, base_weights, rarities, descriptions, _, chosentype = read_file_with_weight(mode, avg, min_val, max_val)
 
-    extra_bonus = 0.0
-    if use_points and st.session_state.get("points_applied", 0.0) > 0:
-        # Por cada punto aplicado, aumentamos la probabilidad de bonus
-        extra_bonus = st.session_state["points_applied"] * 0.01  # Ajusta este valor según balance
-        st.session_state["points_applied"] = 0.0  # Resetear después de usar
-
     for attempt in range(1, max_tries + 1):
-        raritypull = randomizer(min_val, max_val, avg, std_dev=0.8, extra_bonus=extra_bonus)
+        raritypull = randomizer(min_val, max_val, avg, std_dev=0.8)
 
         filtered = [(e, w, r, d) for e, w, r, d in zip(elements, base_weights, rarities, descriptions)
                     if abs(r - raritypull) <= 0.25]
@@ -181,7 +125,8 @@ def run_gacha(mode, min_val, avg, max_val, max_tries=10, use_points=False):
             element, _, rarity, desc = selected
 
             bonus_triggered = False
-            if random.random() < 0.0048 + extra_bonus and rarity + 2 <= 10:
+            # BONUS: 0.48% de probabilidad de +2 de rareza si no supera el máximo
+            if random.random() < 0.0048 and rarity + 2 <= 10:
                 rarity += 2
                 element = f"★ {element}"
                 bonus_triggered = True
@@ -204,7 +149,6 @@ def run_gacha(mode, min_val, avg, max_val, max_tries=10, use_points=False):
 
     return None
 
-
 def get_tier_and_color(rarity):
     tiers = [
         (1.0, 'Trash', '#a39589'),
@@ -222,7 +166,6 @@ def get_tier_and_color(rarity):
         if rarity < limit:
             return name, color
     return "Transcendent", "#ff0000"
-    
 
 # ------------------ STREAMLIT INTERFACE ------------------
 st.title("🎲 Chaos Gacha Web")
@@ -336,9 +279,9 @@ def display_result(result, min_val, max_val):
     luck_type = classify_luck(result["luck"])
 
     st.markdown(f"<h3 style='color:{color}' title='{result['description']}'>🎉 {result['element']}</h3>", unsafe_allow_html=True)
-    st.markdown(f"<span style='color:{color}'><strong>Rarity</strong>: {result['rarity']:.2f} ({tier})</span>", unsafe_allow_html=True)
-    st.markdown(f"<span style='color:{color}'><strong>Type</strong>: {result['type']}</span>", unsafe_allow_html=True)
-    st.markdown(f"<span style='color:{color}'><strong>Estimated Luck</strong>: {result['luck']:.2f}% – {luck_type}</span>", unsafe_allow_html=True)
+    st.markdown(f"<span style='color:{color}'><strong>Rarity</strong>: `{result['rarity']:.2f}` ({tier})</span>", unsafe_allow_html=True)
+    st.markdown(f"<span style='color:{color}'><strong>Type</strong>: `{result['type']}`</span>", unsafe_allow_html=True)
+    st.markdown(f"<span style='color:{color}'><strong>Estimated Luck</strong>: `{result['luck']:.2f}%` – {luck_type}</span>", unsafe_allow_html=True)
     st.markdown("---")
     st.markdown(
         f"<div style='background-color:#111;padding:10px;border-radius:10px;'>"
@@ -346,9 +289,6 @@ def display_result(result, min_val, max_val):
         f"</div>",
         unsafe_allow_html=True
     )
-
-    # Registrar en el historial
-    points_earned = check_duplicates_and_assign_points(result["element"], tier)
 
     # Registrar en el historial
     st.session_state["log"].append({
@@ -359,25 +299,18 @@ def display_result(result, min_val, max_val):
         "Luck": f"{result['luck']:.2f}%",
         "Description": result["description"],
         "Color": color,
-        "Bonus": "★" if result.get("bonus") else "",
-        "Points Earned": points_earned
+        "Bonus": "★" if result.get("bonus") else ""
     })
-
-    if points_earned > 0:
-        st.success(f"¡Duplicado detectado! Has ganado {points_earned:.3f} puntos trascendentes.")
 
 # Botón individual 🎰 Roll
 if st.button("🎰 Roll"):
-    result = run_gacha(mode, min_val, avg, max_val, use_points=True)
+    result = run_gacha(mode, min_val, avg, max_val)
     if result:
         display_result(result, min_val, max_val)
 
 # Botón de Multi-Roll
 if st.button("🎲 Multi-Roll"):
-    results = [
-        run_gacha(mode, min_val, avg, max_val, use_points=(i == 0))
-        for i in range(pull_count)
-    ]
+    results = [run_gacha(mode, min_val, avg, max_val) for _ in range(pull_count)]
     for result in results:
         if result:
             display_result(result, min_val, max_val)
@@ -672,4 +605,3 @@ if version_content and base_name:
         if base_name not in st.session_state.get("original_files", {}):
             st.session_state.setdefault("original_files", {})[base_name] = version_content
         st.success(f"✅ Version added to saved history under '{base_name}' and updated as editable.")
-
