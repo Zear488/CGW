@@ -245,7 +245,7 @@
 124. Pocket Armory,2.2
 #A large grey duffel bag containing a copy of every cold weapon made from high-quality steel, you can take any one weapon out at a time from this bag, if you put the weapon back, the next time you take it out, it will be back in perfect condition.
 125. Servant Voucher,5.3
-#A coupon that allows you to summon your own Heroic Spirit for free, the summoned heroic spirit depends on you as a person. The servant is bound to you in standard Grail War style, with them receiving mana through you via coitus and you possessing 3 command seals to give absolute commands to them.
+#A coupon that allows you to summon your own Heroic Spirit for free, the summoned heroic spirit depends on you as a person. The servant is bound to you in standard Grail War style, with them receiving mana through you via coitus and you possessing 3 command seals to give absolute commands to them. Cannot summon Divine Servants(Divinity above C or Explicitly a god) or Servants that qualify for a Grand position.
 126. Stimpack,2.3
 #Fallout - A potent medical tool from a post-apocalypse world. A stim pack is a syringe pack filled with modified stem cells and healing agents that boost the human body's natural regenerative properties into overdrive. WARNING: Usage of the stimpack without enough nutrients or minerals in the body can cause more harm than good. Restock Timer: 24 hours
 127. Staff of the Pheonix,5.9
@@ -409,7 +409,7 @@
 206. Holy Water,3.2
 #A large glass vial holding 500ml of high-quality holy water that can be used for rituals or for dealing with the pesky unholy. Restock Timer: 4 Hours
 207. Golden Cross,2.6
-#A golden cross blessed by a powerful angel, it wards off evil and is cursed when worn around the neck and burns demonic entities in the vicinity.
+#A golden cross blessed by a powerful angel, it wards off evil and curses when worn around the neck and burns demonic entities in the vicinity.
 208. Super Absorbant Sponge,1.4
 #Terraria - A sponge that can hold approximately 1,000,000,000 liters of water inside of it, don't ask how it doesn't change in size or weight regardless of how much is inside of it.
 209. Heavy Blade,2.9
@@ -705,7 +705,7 @@
 353.Grimoire of Darkness Magic,6.5
 #Black Cover - A book containing the secrets of Darkness Magic from the Clover Kingdom, allowing those who study it to learn and utilize the spells it contains inside. Spell List: https://blackclover.fandom.com/wiki/Dark_Magic
 354.Grimoire of Light Magic,6.4
-#Black Cover - A book containing the secrets of Darkness Magic from the Clover Kingdom, allowing those who study it to learn and utilize the spells it contains inside. Spell List: https://blackclover.fandom.com/wiki/Light_Magic
+#Black Cover - A book containing the secrets of Light Magic from the Clover Kingdom, allowing those who study it to learn and utilize the spells it contains inside. Spell List: https://blackclover.fandom.com/wiki/Light_Magic
 355. Familiar Contract,3.3
 #A contract that allows those who sign it to become registered in your gacha as a familiar that you can treat like any other familiar. They must sign the contract while knowing what it does otherwise it does not work.
 356. Master Blacksmith Commision,4.0
@@ -743,7 +743,7 @@
 372.Wastelanders Survival Kit,2.5
 #Fallout - A survival kit containing the loadout of a true courier. Containing an Elite Riot Gear, A fully modified Anti-Material Sniper Rifle, a Riot Shotgun, A .44 Magnum revolver, A bowie knife, 5 repair kits, 10 stim packs, 5 doctors bags, and 200 ammo for each weapon. No way to be caught lacking in the wastes now.
 373. The Courier's Stash,1.5
-#Fallout - A stash every courier needs to have around just in case they get robbed, shot in the head and left for the dead. This large briefcase a lightweight metal armour, a double-barrel shotgun with 20 packs of 20 shells, 4 basic repair kits, and 5 stim packs. 
+#Fallout - A stash every courier needs to have around just in case they get robbed, shot in the head and left for the dead. This large briefcase contains a lightweight metal armour, a double-barrel shotgun with 20 packs of 20 shells, 4 basic repair kits, and 5 stim packs. 
 374.Hei Gui Stealth Suit,2.8
 #Fallout - A special armour designed by China made for infiltration and stealth missions given to special units. In addition to its dense armour and mesh, the stealth suit is capable of emitting a forcefield that bends light around it to make the user invisible.
 375.Feng Shui Engine,4.3
@@ -860,3 +860,45 @@
 #JJK - A basic cursed tool in the form of a short sword. The sword sword is sharp and durable while also being able to interact with and harm spiritual beings.
 430.Split Soul Katana,5.6
 #JJK - A powerful cursed tool in the form of a large Japanese Broadsword. This sword is capable of cutting through all physical matter by ignoring durability to strike at the soul directly, inflicting wounds that cannot be healed by normal means.
+431.Repair Powder,2.5
+#Darksouls - An enchanted golden powder, when the entire bag is spread across a weapon its durability is restored and its damages repaired as long as the item is in one piece. The stronger or more magical an item is, the more powder is required. Restock Timer: 12 Hours
+432.Threaded Cane,2.2
+#Bloodborne - One of the weapons of the workshop hunters used to face off against the beasts. In its cane form, the threaded cane still has a sharp edge enough to hurt beasts, but when its trick form is revealed the cane splits into numerous blades arranged into a whip that can be used to rend and shred flesh from a distance. 
+433.Chikage,3.0
+#Bloodborne - A blade wielded by the royal guards of Annalise, Queen of the Vilebloods. Chikage is an exceptional katana with incredible durability. But its power comes from the runes engraved onto it, allowing its user to sink the blade into their own flesh and imbue it with their vital essence to amplify its power. In addition, while wielding the Chikage all Necromancy and Blood-based abilities are amplified.
+434.Holy Moonlight Sword,4.0
+#Bloodborne - An ancient sword uncovered and wielded by Ludwig. By expending the user's energy the blade channels the endless abyssal cosmos and wreathes itself in moonlight to amplify its power. The user can expel the moonlight to amplify the power of the blade, release energy bursts or channel their own powers through the blade alongside the moonlight to boost the power. 
+435.Reiterpallasch,2.5
+#Bloodborne - A refined weapon wielded by the knight of Cainhurst Castle. This weapon combines a rapier and a gun without compromising either. This weapon can be transformed into a bayonet to amplify the aspects of the gun part. You can let your own blood and turn it into quicksilver bullets to feed into the gun.
+436.Saw Cleaver,2.0
+#Bloodborne - Iconic weapons of the hunters. This saw can transform into a long cleaver or a serrated saw depending on your needs. In addition, this weapon is stronger the most beastlike your opponent is. 
+437.Bottle of infinite lotion,1.4
+#A simple bottle of slimy lotion that contains an infinite amount of lotion inside. Lotion must be squeezed out manually and trying to tamper with the bottle will simply break it.
+438.Power Pole,3.0
+#Dragon Ball - An incredibly durable Bo Staff wielded by Son Goku(The Saiyan, not the god), that allows the user to freely extend its length by expending their energy.
+439.Kubikiribochi,2.2
+#Naruto - An oversized cleaver-shaped curved sword revered as one of the blades wielded by the seven swordsmen of the mist. This blade is incredibly durable and conducts energy well. In addition, no matter how damaged the blade is, it will repair itself as long as it absorbs blood.
+440.Malorian Overture,2.0
+#Cyberpunk 2077 - A heavy-duty, powerful double-action revolver produced by Malorian Arms. This gun is incredibly powerful, even being able to punch a hole in half-borgs with each bullet. You also get 30 bullets every day for it. 
+441.Deed to Land,2.4
+#A deed to a land, just rip this deed in half and you will have always owned land in a location that is favourable to you.
+442.Deed to Mansion,3.8
+#A deed to a mansion, just rip this deed in half and you will have always owned a lavish mansion manned by a Schrodinger crew that keeps it clean and maintained, they always do the work but can never be seen or interacted with.
+443.Door to Jail,5.8
+#Allows you to open a door to a jail block, this jail block is maintained by automatons, anyone inside of the cells is unable to use it unless allowed by you or who you appoint as warden. Anyone inside the cell is healed slowly and gets served 3 meals a day by the automatons. 
+444.Five Hundred Cigarettes,0.5
+#500 non brand name generic ciggaretes. Useful for taking the edge off.
+445.Rust Bucket,3.7
+#Ben 10 - A fairly large cozy RV owned by Maxwell Tennyson that has been upgraded numerous times with Plumber Technology. In addition to being an effective mobile home, it can fly and is equipped with numerous offence and defence systems.
+446.Transformer Spark,4.4
+#Transformers - A spark is what makes up the being of a Transformer. When you imbue this spark into any sufficiently large piece of technology it will turn into a transformer and register itself as a familiar.
+447.ColorS,1.2
+#Fairy Tail - A small book-like magic item that allows the holder to change the color scheme of their clothing by sliding their finger over its surface.
+448.Gale Force Reading Glasses,2.7
+#Fairy Tail - A magical item in the form of a pair of spectacles. Wearing these glasses allows one to read books much faster. Allowing them to read any book they are holding 64x faster without sacrificing reading comprehension.
+449.Music Player,1.6
+#Not just an ordinary music player, this player is indestructible and has excellent sound quality, with built-in speakers and headphones. It is capable of playing any song the holder has heard of before and records it inside its archive.
+450.Archenemy,5.7
+#Fairy Tail - A sealed sword imbued with extremely uncontrollable amounts of magical power. The moment the sword is unsheathed it will produce a slash that can cut through several city blocks like butter at minimum. It is advised to keep it inside the sheath.
+451.Magic Ticket,4.7
+#Fairy Tail - A magical ticket that when you rip allows you to choose a grimoire that contains a branch of magic from the world of Fairy Tale. Chosen magic cannot be a Lost Magic, Ancient Magic, Time Magic, Space Magic, Dragonslayer Magic or otherwise any magic above Elite tier. The Chosen Magic category is transformed into a Grimoire you can study to learn from.

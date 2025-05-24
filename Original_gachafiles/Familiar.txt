@@ -232,7 +232,7 @@
 #Dragon Ball - A legendary magical dragon capable of granting its user a wish, Shenron can only be manifested once a year, allowing his user to ask for a wish that it will grant as long as it is within his power.
 117. Medusa Gorgon,4.4
 #Soul Eater - Medusa is a natural-born Witch who is capable of taking over bodies and using unique vector magic in tandem with her hand-to-hand combat skills. She is also somewhat of a genius when it comes to matters of soul and chemistry, being able to craft her unique magical agents, with the most notable creation being Black Blood.
-118.. Nyotengu,3.9
+118. Nyotengu,3.9
 #Dead or Alive - A female tengu who is very well-versed in martial arts and seduction. She is capable of summoning winds and storms with her fan like other tengu as well as flying and possessing enhanced strength. 
 119. Kon,3.7
 #Chainsaw Man - Kon is the Fox Devil who embodies the fear of foxes. She is a gigantic monstrous fox, who, thanks to being a devil is capable of making contracts with people and recovering her health by consuming blood. You can partially summon her body parts as attacks or simply summon her outright. Those who make contracts with her can also summon her.
@@ -247,7 +247,7 @@
 124. Shukaku,5.9
 #Naruto - One of the Tailed Beasts, as the one tail, Shukaku is a tailed beast whose body is entirely made up of sand. Shukau has strength befitting his massive frame and his sand physique makes him resistant against physical blows. In addition, Shukaku is capable of creating and controlling sand, wind and magnetism, making him incredibly versatile he can also use sealing techniques to supplement his ability. As a tailed beast, he is immortal and will revive upon death, he can also fuse with a person to grant them his abilities.
 125. Matatabi,5.8
-#Naruto - One of the tailed beasts, as the two tails, Matatabi takes the form of a giant nekomata on blue fire. Matatabi has strength befitting his massive frame in addition, Isobu is capable of creating and controlling fire to utilize a variety of techniques. As a tailed beast, he is immortal and will revive upon death, he can also fuse with a person to grant them his abilities.
+#Naruto - One of the tailed beasts, as the two tails, Matatabi takes the form of a giant nekomata on blue fire. Matatabi has strength befitting his massive frame in addition, Matatabi is capable of creating and controlling fire to utilize a variety of techniques. As a tailed beast, he is immortal and will revive upon death, he can also fuse with a person to grant them his abilities.
 126. Isobu,5.6
 #Naruto - One of the tailed beasts, as the three tails, Isobu takes the form of a giant red and white turtle with a spiky carapace shell. Isobu has strength befitting his giant frame, and agility unbefitting of his frame, he also has exceptional strength. Isobu is capable of creating and controlling water to utilize a variety of techniques, he can also open gates to its pocket space at will. As a tailed beast, he is immortal and will revive upon death, he can also fuse with a person to grant them his abilities.
 127. Son Gokū,5.8
@@ -298,8 +298,8 @@
 #Monster Musume - Rachnera is a female Arachne with skills in a variety of fields. As an Arachne, she has a large body and enhanced physical stats as well as the ability to produce stronger than steel silk on demand. She is also a master seamstress capable of weaving fashionable clothes in seconds.
 161.Doppel,2.9
 #Monster Musume - Doppel is a female(?) doppelganger with military and police training. As a doppelganger, she is capable of turning her body into that of any living creature and clothes she has seen but does not affect her stats as she is not much stronger than a baseline human. 
-162.Dremora Merchant,3.8
-#Skyrim - A Dremora Merchant from Oblivion that can be summoned to your side at any time to be haggled with, the merchant sells items and equipment unique to his world in exchange for gold coins or items. His prices aren't very good. He cannot interfere with the world in any way other than trading.
+162.Spleunker Fairy,3.8
+#A lesser fairy that appears like a spot of glowing yellow light. This Fairy has the ability to find and uncover wealth and treasures. It can point you towards the nearest bar of gold, or an item you are looking for as long as its within its ability to find the ability. It cannot give detailed directions and desciptions.
 163.Dio Brando,4.2
 #JoJo - Dio Brando, son of a petty thief who achieved Vampirism through the stone mask. As a vampire Dio is capable of absorbing lifeforce, granting Vampirism, creating undead, grafting flesh and manipulating his own body. In addition, Dio is a genius and extremely skilled as a vampire.
 164.DIO,5.4
@@ -340,3 +340,39 @@
 #Pokemon - A mysterious entity hiding beneath a shabby costume of another Pokemon in hopes of being loved and accepted due to its real appearance under the disguise being a severe cognito hazard. Mimikyu is capable of creating and controlling shadow constructs to attack and defend.
 182. Wooloo,1.5
 #Pokemon - Wooloo is the sheep Pokemon, which means it is a supernaturally cute and strong sheep with super luxurious wool that grows back entirely within 5 days compared to the average Wooloo. Despite being a powerful beast it has no combat instincts or skill so don't expect combat from it.
+183. Cazador,3.0
+#Fallout New Vegas - Cazadors are insects biogenetically engineered by Dr. Borous. They are faster than cars, tough enough to tank .50 calibre bullets, ruthless, roughly the size of a man, strong enough to tear apart a grown man and with venom potent enough to bring any man to their knees. And they reproduce very rapidly if given enough protein sources. You get 4 breeding pairs.
+184.Nick Valentine,2.5
+#Fallout 4 - Nick is a synthetic human detective. As a Synth, he is slightly stronger than the average man but possesses great accuracy with guns and is highly skilled at interfacing with technology. As expected by a detective, Nick is good at reading people, and investigations and giving advice from his years as a detective in a post-apocalyptic wasteland.
+185.Potato GLaDOS,2.3
+#Portal - Glados is a highly advanced AI that contains an immense amount of data from Aperture Labs and is capable of interfacing with any system and mainframe she is put into. She is capable of building technology too but... she is stuck in a potato. So you will have to find a way to supply her with the technology first. 
+186.Yes Man,1.8
+#Fallout New Vegas - Yes Man is a reprogrammed RobCo brand Securatron. As an AI Yes Man is capable of interfacing with technology and writing code when provided with the right materials. While not very impressive his body is armed with guns strong enough to protect itself. And by its namesake, Yes Man is physically incapable of saying no. Fortunately, this only applies to you.
+187.CZ2128 Delta,3.8
+#Overlord - Or Shizu Delta for short is an Automaton Sniper Maid. Shizu is an expert marksman, being able to use most ranged weapons with great skill, especially the ones she comes equipped with, her body also has the functions of an automaton as well. her skills as a maid is... questionable.
+188.Narberal Gamma,4.1
+#Overlord - Narberal Gamma is a Doppelganger Maid who specialises in Wind and Elemental Magic. Although her skills as a doppelganger are lacking, she is a very skilled magician. She is also an extremely competent maid.
+189.Yuri Alpha,3.9
+#Overlord - Yuri Alpha is the vice leader of the Pleiades and a Dullahan Monk/Pugilist with proficiency in Fa Jin. She is a very powerful close-quarters combatant who can also employ basic magic. She is also an extremely competent maid.
+190.Carla,4.5
+#Fairy Tail - Carla is a white Exceed, a race of catlike beings. She is capable of flight magic and is a capable melee combatant in human form. She also has the ability to use precognition to see potential upcoming futures but she will need training to be able to use it properly.
+191.Daisy,0.2
+#Doom - A cute, if not unremarkable brown pet rabbit named Daisy. Despite being the former pet rabbit of the Doom Slayer it is still just a regular brown rabbit.
+192.Dogmeat,1.7
+#Fallout - Man's most dedicated companion. Dog Meat is a very capable and well-trained German Shepherd who is... seemingly immortal. He can track scents and has considerable intelligence for his species.
+193.Liberty Prime,5.6
+#Fallout - "Democracy is non-negotiable" A pre-war super weapon created by America. Liberty Prime is a large anti-communist mech equipped with armour that laughs in the face of anything below a ballistic missile and the strength to treat a superhuman behemoth like a toddler. Laser Gatlings that can be concentrated into one death beam, and chucks mini nukes like footballs. Liberty's energy and ammunition are refreshed every 24 hours. That includes 8 Mini Nukes.
+194.Toaster,2.7
+#Fallout: Old World Blues - An extremely high tech toaster created by the genius minds in the Big MT. The toaster is capable of granting heating capabilities to technology and expertly disassembling technology into working parts... somehow. And its personality is coded to be a genocidal maniac who wants to burn the world down.
+195.Taurus,2.8
+#Fairy Tail - Taurus is a Celestial Spirit, representing the Taurus constellation they have immense physical abilities that they use to wield an axe with, being quite proficient in melee combat. As a Celestial Spirit their form is liable to change between users. As a Celestial Spirit, they are immortal and her power scales with her owners.
+196.Aquarius,3.8
+#Fairy Tail - Aquarius is a Celestial Spirit, representing the Aquarius Constellation. She has fair physical ability but her true strength lies in her potent Water Magic. As a Celestial Spirit, she is unable to be killed by normal means and her power scales with her owners.
+197.Cancer,2.7
+#Fairy Tail - Cancer is a Celestial Spirit, representing the Cancer Constellation. Cancer's main ability is being a godly hairdresser and possessing incredible agility and dexterity, being able to give an entire group a haircut before they even notice it, they also possess hair magic. As a Celestial Spirit their form is liable to change between users and they are immortal and their power scales with their owners.
+198.Virgo,3.5
+#Fairy Tail - Virgo is a Celestial Spirit, representing the Virgo Constellation. She takes the form of a maid with considerable physical prowess and skill in Earth Magic. She is also a massive masochist which aids her endurance. As a Celestial Spirit, she is unable to be killed by normal means and her power scales with her owners.
+199.Aries,3.0
+#Fairy Tail - Aries is a Celestial Spirit, representing the Aries Constellation. Aries, while not a very skilled melee combatant is a master in wool magic, being able to conjure and control wool. As a Celestial Spirit, she is unable to be killed by normal means and her power scales with her owners.
+200.Libra,3.4
+#Fairy Tail - Libra is a Celestial Spirit, representing the Libra Constellation. Libra is a capable melee fighter but her real strength lies in her mastery over gravity magic, being able to change the weight of her targets at will. As a Celestial Spirit, she is unable to be killed by normal means and her power scales with her owners.

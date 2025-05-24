@@ -29,9 +29,9 @@
 15. Intermediate Blade Weapon Mastery, 2.3
 #You are fairly skilled in handling bladed instruments and weapons such as swords and daggers. You know how to effectively move your body and weapon to make good use of it, being able to match most practitioners in skill and finesse.
 16. Intermediate Blunt Weapon Mastery, 2.1
-#You are fairly skilled in handling blunt instruments and weapons such as hammers, mauls and clubs. You know how to effectively move your body and weapon to make good use of it, being able to match most practitioners in skill and finesse.
+#You are fairly skilled in handling bladed instruments and weapons such as hammers, mauls and clubs. You know how to effectively move your body and weapon to make good use of it, being able to match most practitioners in skill and finesse.
 17. Intermediate Polearm Mastery, 2.6
-#You are fairly skilled in handling long handled instruments and weapons such as spears, halbers and sickles. You know how to effectively move your body and weapon to make good use of it, being able to match most practitioners in skill and finesse.
+#You are fairly skilled in handling bladed instruments and weapons such as spears, halbers and sickles. You know how to effectively move your body and weapon to make good use of it, being able to match most practitioners in skill and finesse.
 18. Intermediate Item Construction, 3.3
 #You know how to make decent magical and enchanted items, if you know fire magic, you can turn a regular sword into a sword that can light itself on fire on command. If you have the ability Invisibility, you can probably make a cloak that suppresses your presence.
 19. Polar Channel flow - Celluar Overdrive, 3.5
@@ -199,7 +199,7 @@
 100. Expert Shooting, 4.6
 #You are an expert marksman, you handle all firearms and projectiles with great skill and finesse to the point where people might wonder if you have special power. You can even curve your shots and utilize ricochets. You can also better predict the trajectory of enemy projectiles.
 101. Expert Hand-to-Hand Combat, 4.5
-#You are an expert martial artist
+#You are an expert martial artist, you move your body like it is a lethal weapon, knowing where to strike and how to move your body to deal damage with expert skill. You learn and master other types of unarmed martial arts much faster.
 102. Expert Programming, 4.1
 #You are an expert programmer, your skill with coding is comparable to a low-level Tinker ability. You can craft and code complex algorithms and programs with ease, you can even make basic artificial intelligences.
 103. Expert Mechanics, 4.2
@@ -356,11 +356,49 @@
 #You have the presence and aura of a god. Your sheer charisma can bring people to their knees, attract people of note to you, calm down a raging beast, or inspire awe from the masses. You will be the most popular being alive.
 179. Divine Medicine, 7.5
 #You are as skilled as a god of health and medicine. You can modify and heal bodies to your liking as long as you have the tools, you know how to cure any ailment, not only that but you can create divine medicines like Panaceas and Elixirs of Immortality. But this knowledge is too much for a mortal vessel, so the knowledge manifests as instinctive comprehension when it comes to all matters of life, the stronger you get the more access you will get to the Divine Knowledge.
-180.Firebending,4.7
+180.Novice Interfacing,1.4
+#You are nimble I can give you that, you know how to pick basic locks, pick pockets, find your way around mechanisms and move with decent grace. 
+181.Intermediate Interfacing,2.3
+#You are a tricky one, you know how to pick locks, pick pockets, figure out the kinks in mechanics and have a feeling for knowing your way around things. Your fingers may get a little restless. 
+182.Adept Interfacing,3.4
+#You are one dextrous fellow with slippery fingers. You can easily pick the most mundane locks, empty people's pockets without them noticing, perform magic tricks(performance, not actual magic), feel your way around the kinks in mechanics, and all around have some very dextrous fingers best at knowing their way around things, few barriers can keep you out, good luck keeping you in jail. 
+183.Expert Interfacing,4.3
+#Your skill in interfacing is at the level where there are few locks and mechanisms that can keep you out. You can probably steal someone's clothes off of their body without them noticing. Your ability to feel around and exploit the weaknesses fo mechanisms such as locks, machines, terminals etc. is on an incredible level.
+184.Master Interfacing,5.8
+#You are a master of interfacing, your fingers are so nimble that any lock or barrier may as well not exist in front of you. You could probably pick your way into Area 53 with a single hairpin. You can steal someone's underwear off their body without them noticing. You can interface with and exploit the weakness of any lock or mechanism like it's your own body. 
+185.Novice Savoir Faire,1.8
+#You know how to move with some relative grace and finesse. You are light on your feet, you know how to dance and how to place your feet so that you don't trip and fall. And if you do fall, you can do so with some semblance of grace.
+186.Intermediate Savoir Faire,2.7
+#You know how to move with grace and finesse. You are light on your feet and you can definitely tear up the dance floor. You rarely lose your balance and can perform parkour. You can also perform flips and manoeuvres with decent grace.
+187.Adept Savoir Faire,3.8
+#You are one smooth bastard. Grace and Finesse are natural to you. Allowing you to move with flair and smoothness. You are skilled at acrobatics, dancing, parkour and anything that requires finesse or agility
+188.Expert Savoir Faire,4.9
+#You are one stylish and cool bastard. Your finesse is unmatched. You can perform acrobatics, dancing, parkour and anything that requires finesse or agility at the level of an expert. You move like the wind and water, you are truly one stylish bastard. 
+189.Master Savoir Faire,5.9
+#You are the master of grace, cool and finesse. You perform feats of acrobatics, dancing, parkour and nimbleness that would baffle the minds of any as natural as you breathe. Even as a baseline human, you could probably dance around bullets.
+190.Novice Stealth,1.4
+You are a novice in the way of stealth, you know how to mask your footsteps, how to sneak up on people, how to check for traps, and how to gather information more effectively. But anyone actually involved in the field is better than you.
+191.Intermediate Stealth,2.4
+You are experienced in the way of stealth, you know how to move silently, how to sneak up on people, how to check for traps, and how to gather information more effectively. You would be a qualified ninja grunt.
+192.Adept Stealth,3.6
+You are skilled in the way of stealth, you know how to move silently, how to sneak up on people, how to check for traps, you can blend into your surroundings and sneak up on people who know you are coming. You would make Solid Snake proud.
+193.Expert Stealth,4.7
+You are an expert in the way of stealth, you know how to move like a ghost, silently, blend into your surroundings and swim with the shadows. You could sneak into a military base and no soul would know you were there. You could stalk an owl through a forest while wearing a high-visibility jacket. You are up there with the greatest assassins.
+194.Master Stealth,5.8
+You have mastered the art of stealth, you blend in with the shadows and move without a single sound, you can also suppress your presence so much that even someone looking directly at you would struggle to distinguish between you and the world around you. You are in league with even the greatest of the Hassasin.
+195.Jack of All Trades,3.2
+#You have novice-level expertise in all basic skills, you can cook, smith, perform medicine, draw, repair, teach, drive, interface, and know most fields of study with basic competence and are fairly talented in those fields. Does not extend to combat skills. 
+196.Queen of All Trades,4.6
+#You have intermediate-level expertise in all basic trades, you can cook, smith, perform medicine, draw, repair, teach, drive and interface with fair competence comparable to actual performers of the trade and are talented in those fields. Does not extend to combat skills. 
+197.King of All Trades,5.1
+#You have Adept-level expertise in all basic trades, you can cook, smith, perform medicine, draw, repair, teach, drive and interface with fair competence comparable to an actual veteran of the trade and are greatly talented in those fields. Does not extend to combat skills.
+198.Ace of All Trades,6.2
+#You have Expert-level expertise in all basic trades, you can cook, smith, perform medicine, draw, build, teach, drive and interface with fair competence comparable to true experts of said trades and are very talented in those fields. Does not extend to combat skills.
+199.Firebending,4.7
 #Avatar - You are an apprentice Firebender, being able to convert your internal energy into fire you can manipulate with your own form of movements and martial arts. The more experienced and trained you are the stronger your bending.
-181.Waterbending,4.6
+200.Waterbending,4.6
 #Avatar - You are an apprentice Waterbender, being able to use your internal energy to interact with the water in the world around you, using movements to bend to your will. The more experienced and trained you are the stronger your bending.
-182.Airbending,4.9
+201.Airbending,4.9
 #Avatar - You are an apprentice Airbender, being able to use your internal energy to interact with the water in the world around you, using movements to bend to your will. The more experienced and trained you are the stronger your bending.
-183.Earthbending,4.5
+202.Earthbending,4.5
 #Avatar - You are an apprentice Earthbender, being able to use your internal energy to interact with the water in the world around you, using movements to bend to your will. The more experienced and trained you are the stronger your bending.

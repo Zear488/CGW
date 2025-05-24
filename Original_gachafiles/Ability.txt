@@ -1962,7 +1962,7 @@ The harder a battle is, the stronger and faster you grow in the middle of it, al
 981.Teleport,6.2
 #You can teleport, and everything that entails. As long as you are properly aware of the location or its coordinates you can instantly teleport to it, teleportation is instant and scales slightly with distance, but even a beginner could skip countries. Overuse can cause vertigo.
 982. Shut Down,5.0
-#You are able to create a large zone around you that shuts off the functions of magical and scientific items. In this range, even the Excalibur is just a very durable sword. But if the item is too far above your level their power is simply drastically reduced.
+#You are able to create a large zone around you that shuts off the functions of magical and sci-fi items. In this range, even the Excalibur is just a very durable sword. But if the item is too far above your level their power is simply drastically reduced.
 983.Stone Free,4.0
 #JoJo - Stone Free allows you to convert any part of your body into translucent string you can control and move at will. The strong has the exact same physical abilities as you and can be instinctively woven into complex patterns etc.
 984.Petal Burst,3.4

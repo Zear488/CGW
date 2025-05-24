@@ -325,7 +325,7 @@
 165. Sea Monarch,7.1
 #You are the Sea Monarch, the ruler of all that is Water and the depths. Your vitality is massively increased as the sea is the mother of all life. All water-related abilities below Mythical Tier are increased by one rank and cost less energy to use. All water and sea-aligned beings instinctively recognize you as the monarch. You are immune to water and ice-based abilities.
 166. Sky Monarch,7.9
-#You are the Ice Monarch, the ruler of all that is Sky. Your agility is massively enhanced, as you are as free as the wind. All wind and lightning-related abilities below Mythical Tier are increased by one rank and cost less energy to use. All sky-aligned beings instinctively recognize you as the monarch. You are immune to wind and lightning-based abilities.
+#You are the Sky Monarch, the ruler of all that is Sky. Your agility is massively enhanced, as you are as free as the wind. All wind and lightning-related abilities below Mythical Tier are increased by one rank and cost less energy to use. All sky-aligned beings instinctively recognize you as the monarch. You are immune to wind and lightning-based abilities.
 167. Hero,4.5
 #You are a Hero, a child blessed by light and holy. All Light and Holy-based abilities are strengthened alongside your physical abilities. Beings aligned with the Divine/Clergy are more favorable toward you and are more likely to view you with reverence and affection, and to reward you for your merits and service for them. In addition, all blessings are stronger and last longer on you. 
 168. Free Bird,3.6
@@ -491,7 +491,7 @@
 248. Superconductor,4.6
 #Your body is a funnel and connection for lightning. All Lightning-based abilities are more potent, cost less energy to use, and are easier to master. In addition, you can ground lightning and electricity, absorbing a portion of their energy as you do so.
 249. Earthbound Ancient,6.2
-#You are one with the primordial earth, all earth-based abilities are far more potent, cost less energy to use, and are easier to master. In addition, you recover energy faster when in the sky.
+#You are one with the primordial earth, all earth-based abilities are far more potent, cost less energy to use, and are easier to master. In addition, you recover energy faster when in standing on ground and even faster the more underground you are.
 250. Grounded,4.4
 #You embody the immovable earth, all earth-based abilities are more potent, cost less energy to use, and are easier to master. In addition, you recover energy faster when underground.
 251. Skyward,4.2
@@ -696,3 +696,31 @@
 #Marvel - Your Skeleton is bonded with Adamantium, making it borderline unbreakable but also severely poisons you. Unless you have countermeasures lined up you should wait before you activate this trait.
 352.Sensor,2.9
 #You have always had a knack for sensing and locating energy/mana/chakra etc. Your ability to sense and locate energy as well as your Thinker abilities are enhanced.
+353.Man vs World,4.8
+#It's you against the world. The more you are outnumbered in a fight, the stronger you get. For an enemy to count they must be willing to inflict grievous harm on you. The upper limit is 1 vs 1000, this effect is cut in half for every ally you have against the outnumbering enemies.
+354.Duelist,4.1
+#It's time to duel! When in a one vs one fight your stats are increased. This trait is dispelled when any other combatant intervenes in the fight.
+355.Multitasking3.2
+#You are very good at multitasking, being able to divide your attention into multiple sources without a decrease in efficiency. Your efficiency may decline with too many tasks at once.
+356.Scavenger,2.4
+#Whenever you go scavenging, whether it is for treasure, lost parts, artefacts, etc. You have a better chance of finding something useful.
+357.Meet Cute,2.8
+#As you go about your daily life, you are much more likely to encounter romantic interests in favourable positions.
+358.Blood Mana,2.6
+#You've got no energy? Well, you've got something else, don't you? You can treat your own vitality as a secondary mana bar at a 1 to 1 rate of exchange. Expended vitality cannot be cured by healing but only through rest.
+359.Angel,3.4
+#Race Change - You are an Angel, a being created with holy power, as an angel you have slightly increased physical stats and the ability to fly using your wings naturally. In addition, your Holy and Light-based abilities are more potent, in exchange all Darkness and Unholy abilities are weakened. You are also vulnerable to unholy attributes. 
+360.Principality,4.2
+#Race Change - You are a Principality, a higher tier angel with two pairs of wings, a being created with holy power, as an angel you have increased physical stats and energy reserves as well as the ability to fly using your wings. In addition, your Holy and Light-based abilities are more potent, in exchange all Darkness and Unholy abilities are weakened. You are also vulnerable to unholy attributes. 
+361.Dominion,5.4
+#Race Change - You are a Dominion, a high-tier angel with three pairs of wings. As a Dominion, you possess increased magical and physical abilities. All Holy and Light attributes are considerably boosted and cost less mana to use. You also possess the ability to convert your own energy to holy light and instinctively learn Holy and Light Magic. In exchange, all Darkness and Unholy attributes are greatly weakened.
+362.Throne,6.5
+#Race Change - You are a Throne, one of the highest-ranking angels with four pairs of wings. As a Throne, you possess great physical and magical abilities. All Holy and Light attributes are greatly boosted and cost less mana to use. You are capable of instinctively developing Holy and Light Magic. You also possess the ability to convert your own energy to holy light. In exchange, all Darkness and Unholy attributes are greatly weakened and will hurt you upon use.
+363.Seraphim,7.2
+#Race Change - You are a Seraphim, the strongest kind of Angel there is, as a being of pure holy power you have 5 pairs of wings. As a Seraphim you have incredible magical and physical power. All Holy and Light abilities and magic you have are boosted by a tier as long as they are legendary rank or below, you are also instinctively capable of using and developing Holy and Light Magic. You can convert your own Mana into a Holy Mana Burst. But in Exchange, you are completely incapable of using all Darkness and Unholy abilities and magic.
+364.Student,2.4
+#You are a studious student. You learn things faster and easier when taught personally by someone who has a higher skill level than you in the subject in question.
+365.Disciple,3.2
+#You are a great disciple. You learn things faster and easier when taught personally by someone who has a higher skill level than you in the subject in question. In addition, it is easier to earn the favour of your teachers.
+366.Prodigious Pupil,4.1
+#You are THE Pupil. You learn things much faster and far more easily when taught personally by someone who has a higher skill level than you in the subject in question. In addition, it is easier to earn the favour of your teachers.
