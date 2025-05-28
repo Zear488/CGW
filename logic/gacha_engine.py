@@ -1,10 +1,12 @@
 import random
 from .tracker import GachaHistoryTracker
-from .utils import run_gacha, get_tier_and_color
-from logic.tracker import GachaHistoryTracker
+from .utils import get_tier_and_color
+
 tracker = GachaHistoryTracker()
 
 def perform_gacha_draw(mode, min_val, avg, max_val, boost_transcendent=False):
+    from .utils import run_gacha
+
     if boost_transcendent and tracker.get_points() < 200:
         boost_transcendent = False
 
@@ -38,4 +40,3 @@ def perform_gacha_draw(mode, min_val, avg, max_val, boost_transcendent=False):
 
         return pull_data
     return None
-
