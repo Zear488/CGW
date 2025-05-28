@@ -139,8 +139,18 @@ def perform_gacha_draw(mode, min_val, avg, max_val, num_pulls=1, boost_transcend
                 element, _, rarity, desc = selected
                 bonus_triggered = False
 
-                # Bonus estrella: 0.48% de probabilidad de subir +2 de rareza
-                if random.random() < 0.0048 and rarity + 2 <= 10:
+                # Calcular probabilidad total del bonus estrella
+                base_star_chance = 0.0048  # 0.48%
+                tp = tracker.get_points()
+                boost_star_chance = 0.0
+
+                if boost_transcendent and tp >= 5:
+                    boost_star_chance = min(0.0023 * tp, 0.50)  # 0.23% por TP, hasta máximo 50%
+
+                total_star_chance = base_star_chance + boost_star_chance
+
+                # Aplicar bonus estrella si corresponde
+                if random.random() < total_star_chance and rarity + 2 <= 10:
                     rarity += 2
                     element = f"★ {element}"
                     bonus_triggered = True
@@ -169,14 +179,10 @@ def perform_gacha_draw(mode, min_val, avg, max_val, num_pulls=1, boost_transcend
                 if tracker.check_repeat(pull_data):
                     pull_data["Notes"] = "🔁 Repeated — +1 TP"
 
-                # Boost Transcendente manual (solo si no fue repetido)
-                elif boost_transcendent and tracker.get_points() >= 5:
-                    if random.random() < 0.25:
-                        pull_data["Tier"] = "Transcendent"
-                        pull_data["Rarity"] = "10.00"
-                        pull_data["Color"] = "#ff0000"
-                        pull_data["Notes"] = "✨ Boosted to Transcendent — -5 TP"
-                        tracker.spend_points(5)
+                # Si fue boosteado con TP y se activó el bonus, gastar todos los puntos
+                elif bonus_triggered and boost_star_chance > 0:
+                    pull_data["Notes"] = f"✨ Boosted Star Bonus — -{tp} TP"
+                    tracker.spend_points(tp)
 
                 results.append(pull_data)
                 break
@@ -309,48 +315,46 @@ def classify_luck(luck_value):
 
 # Función para mostrar un resultado
 def display_result(result, min_val, max_val):
-    tier, color = get_tier_and_color(result["rarity"])
-    luck_type = classify_luck(result["luck"])
+    tier, color = get_tier_and_color(float(result["Rarity"]))
+    luck_type = classify_luck(float(result["Luck"].replace('%', '')))
 
-    st.markdown(f"<h3 style='color:{color}' title='{result['description']}'>🎉 {result['element']}</h3>", unsafe_allow_html=True)
-    st.markdown(f"<span style='color:{color}'><strong>Rarity</strong>: `{result['rarity']:.2f}` ({tier})</span>", unsafe_allow_html=True)
-    st.markdown(f"<span style='color:{color}'><strong>Type</strong>: `{result['type']}`</span>", unsafe_allow_html=True)
-    st.markdown(f"<span style='color:{color}'><strong>Estimated Luck</strong>: `{result['luck']:.2f}%` – {luck_type}</span>", unsafe_allow_html=True)
+    st.markdown(f"<h3 style='color:{color}' title='{result['Description']}'>🎉 {result['Element']}</h3>", unsafe_allow_html=True)
+    st.markdown(f"<span style='color:{color}'><strong>Rarity</strong>: `{float(result['Rarity']):.2f}` ({tier})</span>", unsafe_allow_html=True)
+    st.markdown(f"<span style='color:{color}'><strong>Type</strong>: `{result['Type']}`</span>", unsafe_allow_html=True)
+    st.markdown(f"<span style='color:{color}'><strong>Estimated Luck</strong>: `{result['Luck']}` – {luck_type}</span>", unsafe_allow_html=True)
     st.markdown("---")
     st.markdown(
         f"<div style='background-color:#111;padding:10px;border-radius:10px;'>"
-        f"<p style='color:white;font-size:16px;line-height:1.5;text-align:justify;'>{result['description']}</p>"
+        f"<p style='color:white;font-size:16px;line-height:1.5;text-align:justify;'>{result['Description']}</p>"
         f"</div>",
         unsafe_allow_html=True
     )
 
-    # Registrar en el historial
     log_entry = {
-    "Type": result["Type"],
-    "Element": result["Element"],
-    "Rarity": result["Rarity"],
-    "Tier": result["Tier"],
-    "Luck": result["Luck"],
-    "Description": result["Description"],
-    "Color": result["Color"]
-}
+        "Type": result["Type"],
+        "Element": result["Element"],
+        "Rarity": result["Rarity"],
+        "Tier": result["Tier"],
+        "Luck": result["Luck"],
+        "Description": result["Description"],
+        "Color": result["Color"]
+    }
 
-    if result.get("Repeated"):
-     log_entry["Notes"] = "🔁 Repeated — +1 TP"
-    elif result["Tier"] == "Transcendent":
-     log_entry["Notes"] = "✨ Boosted to Transcendent — -5 TP"
+    if result.get("Notes"):
+        log_entry["Notes"] = result["Notes"]
 
     st.session_state["log"].append(log_entry)
 
 # Botón individual 🎰 Roll
 if st.button("🎰 Roll", type="primary"):
-    result = perform_gacha_draw(mode, min_val, avg, max_val, boost_transcendent=True)
-    if result:
-        display_result(result, min_val, max_val)
+    results = perform_gacha_draw(mode, min_val, avg, max_val, num_pulls=1, boost_transcendent=True)
+    for result in results:
+        if result:
+            display_result(result, min_val, max_val)
 
-# Botón de Multi-Roll
+# Botón de Multi-Roll 🎲
 if st.button("🎲 Multi-Roll"):
-    results = [perform_gacha_draw(mode, min_val, avg, max_val) for _ in range(pull_count)]
+    results = perform_gacha_draw(mode, min_val, avg, max_val, num_pulls=pull_count, boost_transcendent=True)
     for result in results:
         if result:
             display_result(result, min_val, max_val)
