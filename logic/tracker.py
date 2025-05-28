@@ -44,3 +44,14 @@ class GachaHistoryTracker:
             self._save_json(POINTS_FILE, self.points)
             return True
         return False
+    def clear_all(self):
+    self.repeats = {}
+    self.points = {"points": 0}
+    self._save_json(REPEATS_FILE, self.repeats)
+    self._save_json(POINTS_FILE, self.points)
+
+    def load_from_log(self, log: List[Dict]):
+    self.repeats = {f"{entry['Type']}::{entry['Element']}": True for entry in log}
+    self._save_json(REPEATS_FILE, self.repeats)
+    self.points = {"points": sum(1 for entry in log if entry.get("Notes", "").startswith("🔁"))}
+    self._save_json(POINTS_FILE, self.points)

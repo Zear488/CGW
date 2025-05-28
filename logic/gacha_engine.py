@@ -5,7 +5,7 @@ from logic.tracker import GachaHistoryTracker
 tracker = GachaHistoryTracker()
 
 def perform_gacha_draw(mode, min_val, avg, max_val, boost_transcendent=False):
-    if boost_transcendent and tracker.get_points() < 5:
+    if boost_transcendent and tracker.get_points() < 200:
         boost_transcendent = False
 
     # Tirada normal
@@ -34,7 +34,8 @@ def perform_gacha_draw(mode, min_val, avg, max_val, boost_transcendent=False):
                 pull_data["Tier"] = "Transcendent"
                 pull_data["Rarity"] = "10.00"
                 pull_data["Color"] = "#ff0000"
-                tracker.spend_points(5)
+                tracker.spend_points(200)
 
         return pull_data
     return None
+

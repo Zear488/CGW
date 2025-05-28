@@ -27,8 +27,9 @@ if uploaded_file:
     try:
         df_loaded = pd.read_csv(uploaded_file, encoding="utf-8-sig")
         required_cols = {"Type", "Element", "Rarity", "Tier", "Luck", "Description", "Color"}
-        if required_cols.issubset(set(df_loaded.columns)):
+        if required_cols.issubset(df_loaded.columns):
             st.session_state["log"] = df_loaded.to_dict(orient="records")
+            tracker.load_from_log(st.session_state["log"])  
             st.sidebar.success("✅ History loaded successfully.")
         else:
             st.sidebar.error("❌ Invalid CSV format. Columns missing.")
@@ -37,6 +38,7 @@ if uploaded_file:
 
 if st.sidebar.button("🗑️ Clear History"):
     st.session_state["log"] = []
+    tracker.clear_all()
 
 # Mostrar Transcendent Points
 tracker = GachaHistoryTracker()
@@ -649,3 +651,4 @@ if version_content and base_name:
         if base_name not in st.session_state.get("original_files", {}):
             st.session_state.setdefault("original_files", {})[base_name] = version_content
         st.success(f"✅ Version added to saved history under '{base_name}' and updated as editable.")
+
