@@ -67,7 +67,7 @@ pyinstaller --onefile ^
 ## 🌐 Online Version
 
 You can try the web version of this app hosted on Streamlit Cloud:  
-🔗 https://gachaapppy-yug6hpd3wi2znf2sl55z7r.streamlit.app/
+🔗 https://gachaapppy-n4vmqf3krbmgzmbndci2yw.streamlit.app/
 
 ---
 
