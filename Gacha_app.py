@@ -5,8 +5,13 @@ import random
 import os
 import re
 from streamlit.components.v1 import html
+from logic import perform_gacha_draw, GachaHistoryTracker
+from logic.tracker import GachaHistoryTracker
+from logic.gacha_engine import perform_gacha_draw
 import numpy as np
 import math
+
+tracker = GachaHistoryTracker()
 
 # ------------------ CONFIG ------------------
 st.set_page_config(page_title="Chaos Gacha Web", layout="wide")
@@ -32,6 +37,10 @@ if uploaded_file:
 
 if st.sidebar.button("🗑️ Clear History"):
     st.session_state["log"] = []
+
+# Mostrar Transcendent Points
+tracker = GachaHistoryTracker()
+st.sidebar.markdown(f"⭐ Transcendent Points: `{tracker.get_points()}`")
 
 # ------------------ READ FUNCTION ------------------
 def read_file_with_weight(filename, avg, min_val, max_val):
@@ -106,48 +115,73 @@ def randomizer(min_val, max_val, avg, std_dev=0.8, bonus_chance=0.0048, bonus_ma
     # Si falla todo, retorna el peor resultado
     return round(min_val, 2)
     
-def run_gacha(mode, min_val, avg, max_val, max_tries=10):
+
+tracker = GachaHistoryTracker()
+
+def perform_gacha_draw(mode, min_val, avg, max_val, num_pulls=1, boost_transcendent=False, max_tries=10):
+    results = []
     elements, base_weights, rarities, descriptions, _, chosentype = read_file_with_weight(mode, avg, min_val, max_val)
 
-    for attempt in range(1, max_tries + 1):
-        raritypull = randomizer(min_val, max_val, avg, std_dev=0.8)
+    for _ in range(num_pulls):
+        for attempt in range(1, max_tries + 1):
+            raritypull = randomizer(min_val, max_val, avg, std_dev=0.8)
 
-        filtered = [(e, w, r, d) for e, w, r, d in zip(elements, base_weights, rarities, descriptions)
-                    if abs(r - raritypull) <= 0.25]
+            filtered = [(e, w, r, d) for e, w, r, d in zip(elements, base_weights, rarities, descriptions)
+                        if abs(r - raritypull) <= 0.25]
 
-        if filtered:
-            adjusted_weights = [w for _, w, _, _ in filtered]
-            filtered_weights_sum = sum(adjusted_weights)
-            if filtered_weights_sum == 0:
-                return None
+            if filtered:
+                adjusted_weights = [w for _, w, _, _ in filtered]
+                filtered_weights_sum = sum(adjusted_weights)
+                if filtered_weights_sum == 0:
+                    break  # skip this pull
 
-            selected = random.choices(filtered, weights=adjusted_weights)[0]
-            element, _, rarity, desc = selected
+                selected = random.choices(filtered, weights=adjusted_weights)[0]
+                element, _, rarity, desc = selected
+                bonus_triggered = False
 
-            bonus_triggered = False
-            # BONUS: 0.48% de probabilidad de +2 de rareza si no supera el máximo
-            if random.random() < 0.0048 and rarity + 2 <= 10:
-                rarity += 2
-                element = f"★ {element}"
-                bonus_triggered = True
+                # Bonus estrella: 0.48% de probabilidad de subir +2 de rareza
+                if random.random() < 0.0048 and rarity + 2 <= 10:
+                    rarity += 2
+                    element = f"★ {element}"
+                    bonus_triggered = True
 
-            rarity_range = max_val - min_val
-            if rarity_range == 0:
-                estimated_luck = 100.0
-            else:
-                distance_from_min = rarity - min_val
-                estimated_luck = max(0.1, min(100.0, 100.0 * (1 - (distance_from_min / rarity_range))))
+                # Calcular suerte estimada
+                rarity_range = max_val - min_val
+                if rarity_range == 0:
+                    estimated_luck = 100.0
+                else:
+                    distance_from_min = rarity - min_val
+                    estimated_luck = max(0.1, min(100.0, 100.0 * (1 - (distance_from_min / rarity_range))))
 
-            return {
-                "element": element,
-                "rarity": round(rarity, 2),
-                "description": desc.replace("#", "").strip(),
-                "luck": round(estimated_luck, 2),
-                "type": chosentype,
-                "bonus": bonus_triggered
-            }
+                tier, color = get_tier_and_color(rarity)
+                pull_data = {
+                    "Type": chosentype,
+                    "Element": element,
+                    "Rarity": f"{round(rarity, 2):.2f}",
+                    "Tier": tier,
+                    "Luck": f"{round(estimated_luck, 2):.2f}%",
+                    "Description": desc.replace("#", "").strip(),
+                    "Color": color,
+                    "Notes": ""
+                }
 
-    return None
+                # Verificar repetido
+                if tracker.check_repeat(pull_data):
+                    pull_data["Notes"] = "🔁 Repeated — +1 TP"
+
+                # Boost Transcendente manual (solo si no fue repetido)
+                elif boost_transcendent and tracker.get_points() >= 5:
+                    if random.random() < 0.25:
+                        pull_data["Tier"] = "Transcendent"
+                        pull_data["Rarity"] = "10.00"
+                        pull_data["Color"] = "#ff0000"
+                        pull_data["Notes"] = "✨ Boosted to Transcendent — -5 TP"
+                        tracker.spend_points(5)
+
+                results.append(pull_data)
+                break
+
+    return results
 
 def get_tier_and_color(rarity):
     tiers = [
@@ -291,26 +325,32 @@ def display_result(result, min_val, max_val):
     )
 
     # Registrar en el historial
-    st.session_state["log"].append({
-        "Type": result["type"],
-        "Element": result["element"],
-        "Rarity": f"{result['rarity']:.2f}",
-        "Tier": tier,
-        "Luck": f"{result['luck']:.2f}%",
-        "Description": result["description"],
-        "Color": color,
-        "Bonus": "★" if result.get("bonus") else ""
-    })
+    log_entry = {
+    "Type": result["Type"],
+    "Element": result["Element"],
+    "Rarity": result["Rarity"],
+    "Tier": result["Tier"],
+    "Luck": result["Luck"],
+    "Description": result["Description"],
+    "Color": result["Color"]
+}
+
+    if result.get("Repeated"):
+     log_entry["Notes"] = "🔁 Repeated — +1 TP"
+    elif result["Tier"] == "Transcendent":
+     log_entry["Notes"] = "✨ Boosted to Transcendent — -5 TP"
+
+    st.session_state["log"].append(log_entry)
 
 # Botón individual 🎰 Roll
-if st.button("🎰 Roll"):
-    result = run_gacha(mode, min_val, avg, max_val)
+if st.button("🎰 Roll", type="primary"):
+    result = perform_gacha_draw(mode, min_val, avg, max_val, boost_transcendent=True)
     if result:
         display_result(result, min_val, max_val)
 
 # Botón de Multi-Roll
 if st.button("🎲 Multi-Roll"):
-    results = [run_gacha(mode, min_val, avg, max_val) for _ in range(pull_count)]
+    results = [perform_gacha_draw(mode, min_val, avg, max_val) for _ in range(pull_count)]
     for result in results:
         if result:
             display_result(result, min_val, max_val)
