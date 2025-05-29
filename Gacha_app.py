@@ -11,48 +11,37 @@ from logic.gacha_engine import perform_gacha_draw
 import numpy as np
 import math
 
+tracker = GachaHistoryTracker()
+
 # ------------------ CONFIG ------------------
 st.set_page_config(page_title="Chaos Gacha Web", layout="wide")
 
 # ------------------ LOAD EXISTING HISTORY ------------------
 st.sidebar.header("📂 Load Previous History")
-
 uploaded_file = st.sidebar.file_uploader("Upload history CSV (UTF-8)", type=["csv"])
-manual_csv = st.sidebar.text_area("📋 Or paste CSV content manually")
 
 if "log" not in st.session_state:
     st.session_state["log"] = []
-
-tracker = GachaHistoryTracker()
-
-def load_csv_data(content: str):
+    
+if uploaded_file:
     try:
-        df_loaded = pd.read_csv(io.StringIO(content))
+        df_loaded = pd.read_csv(uploaded_file, encoding="utf-8-sig")
         required_cols = {"Type", "Element", "Rarity", "Tier", "Luck", "Description", "Color"}
         if required_cols.issubset(df_loaded.columns):
             st.session_state["log"] = df_loaded.to_dict(orient="records")
-            tracker.load_from_log(st.session_state["log"])
+            tracker.load_from_log(st.session_state["log"])  
             st.sidebar.success("✅ History loaded successfully.")
         else:
-            st.sidebar.error(f"❌ Invalid CSV format. Missing columns: {', '.join(required_cols - set(df_loaded.columns))}")
+            st.sidebar.error("❌ Invalid CSV format. Columns missing.")
     except Exception as e:
-        st.sidebar.error(f"❌ Error loading CSV: {e}")
+        st.sidebar.error(f"❌ Error loading file: {e}")
 
-# Opción 1: desde archivo
-if uploaded_file:
-    content = uploaded_file.read().decode("utf-8-sig")
-    load_csv_data(content)
-
-# Opción 2: desde texto pegado
-elif manual_csv.strip():
-    load_csv_data(manual_csv.strip())
-
-# Botón para borrar historial y archivos
 if st.sidebar.button("🗑️ Clear History"):
     st.session_state["log"] = []
     tracker.clear_all()
 
-# Mostrar puntos
+# Mostrar Transcendent Points
+tracker = GachaHistoryTracker()
 st.sidebar.markdown(f"⭐ Transcendent Points: `{tracker.get_points()}`")
 
 # ------------------ READ FUNCTION ------------------
