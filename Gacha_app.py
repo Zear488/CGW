@@ -18,32 +18,93 @@ st.set_page_config(page_title="Chaos Gacha Web", layout="wide")
 
 # ------------------ LOAD EXISTING HISTORY ------------------
 st.sidebar.header("📂 Load Previous History")
+
 uploaded_file = st.sidebar.file_uploader("Upload history CSV (UTF-8)", type=["csv"])
+manual_csv = st.sidebar.text_area("📋 Or paste CSV content manually", key="manual_csv")
 
 if "log" not in st.session_state:
     st.session_state["log"] = []
-    
-if uploaded_file:
+
+def load_csv_data(content: str):
+    global tracker
     try:
-        df_loaded = pd.read_csv(uploaded_file, encoding="utf-8-sig")
+        # Detectar separador probable
+        if "\t" in content:
+            sep = "\t"
+        elif ";" in content:
+            sep = ";"
+        else:
+            sep = ","
+
+        df_loaded = pd.read_csv(io.StringIO(content), sep=sep)
+
+        # Si solo hay una columna, forzar con tab
+        if len(df_loaded.columns) == 1:
+            df_loaded = pd.read_csv(io.StringIO(content), sep="\t")
+
         required_cols = {"Type", "Element", "Rarity", "Tier", "Luck", "Description", "Color"}
         if required_cols.issubset(df_loaded.columns):
-            st.session_state["log"] = df_loaded.to_dict(orient="records")
-            tracker.load_from_log(st.session_state["log"])  
-            st.sidebar.success("✅ History loaded successfully.")
-        else:
-            st.sidebar.error("❌ Invalid CSV format. Columns missing.")
-    except Exception as e:
-        st.sidebar.error(f"❌ Error loading file: {e}")
 
+            # 🔧 LIMPIAR columnas antes de pasar al tracker
+            df_loaded["Rarity"] = pd.to_numeric(df_loaded["Rarity"], errors="coerce")
+            df_loaded["Luck"] = df_loaded["Luck"].astype(str).str.replace('%', '', regex=False)
+            df_loaded["Luck"] = pd.to_numeric(df_loaded["Luck"], errors="coerce")
+
+            if "Notes" in df_loaded.columns:
+                df_loaded["Notes"] = df_loaded["Notes"].fillna("").astype(str)
+            else:
+                df_loaded["Notes"] = ""
+
+            if any("���" in note for note in df_loaded["Notes"]):
+                st.sidebar.warning("⚠️ Some notes contain unreadable characters (���). This may affect TP calculation.")
+
+            # Guardar en sesión
+            st.session_state["log"] = df_loaded.to_dict(orient="records")
+
+            # ✅ Tracker debe cargarse DESPUÉS de limpiar
+            tracker.load_from_log(st.session_state["log"])
+
+            st.sidebar.success("✅ History loaded successfully.")
+
+            # 🧹 Limpiar textarea para evitar recarga infinita
+            st.session_state["manual_csv"] = ""
+
+        else:
+            missing = required_cols - set(df_loaded.columns)
+            st.sidebar.error(f"❌ Invalid CSV format. Missing columns: {', '.join(missing)}")
+            st.sidebar.write("🔎 Columns found:", list(df_loaded.columns))
+            st.sidebar.dataframe(df_loaded.head())
+
+    except Exception as e:
+        st.sidebar.error(f"❌ Error loading CSV: {e}")
+
+# Opción 1: archivo subido
+if uploaded_file:
+    content = uploaded_file.read().decode("utf-8-sig")
+    load_csv_data(content)
+
+# Opción 2: texto pegado manualmente
+elif manual_csv.strip():
+    load_csv_data(manual_csv.strip())
+
+# Ayuda visual
+with st.sidebar.expander("📘 CSV Format Help"):
+    st.markdown("""
+    Paste content **with tabs between fields**, like this:
+
+    ```
+    Type	Element	Rarity	Tier	Luck	Description	Color
+    Ability	862.Bountiful Harvest	1.7	Common	50.00%	You are able to create ripe and tasty fruits and vegetables by expending your own energy.	#9c7e5a
+    Ability	751. Fake Weapon	0.7	Trash	81.25%	Allows you to create illusionary weapons in your hands for intimidation purposes.	#a39589
+    ```
+    """)
+# Borrar historial y archivos JSON asociados
 if st.sidebar.button("🗑️ Clear History"):
     st.session_state["log"] = []
     tracker.clear_all()
 
-# Mostrar Transcendent Points
-tracker = GachaHistoryTracker()
+# Mostrar puntos actuales
 st.sidebar.markdown(f"⭐ Transcendent Points: `{tracker.get_points()}`")
-
 # ------------------ READ FUNCTION ------------------
 def read_file_with_weight(filename, avg, min_val, max_val):
     elements, weights, rarities, descriptions = [], [], [], []
@@ -117,9 +178,6 @@ def randomizer(min_val, max_val, avg, std_dev=0.8, bonus_chance=0.0048, bonus_ma
     # Si falla todo, retorna el peor resultado
     return round(min_val, 2)
     
-
-tracker = GachaHistoryTracker()
-
 def perform_gacha_draw(mode, min_val, avg, max_val, num_pulls=1, boost_transcendent=False, max_tries=10):
     results = []
     elements, base_weights, rarities, descriptions, _, chosentype = read_file_with_weight(mode, avg, min_val, max_val)
@@ -320,13 +378,27 @@ def display_result(result, min_val, max_val):
     tier, color = get_tier_and_color(float(result["Rarity"]))
     luck_type = classify_luck(float(result["Luck"].replace('%', '')))
 
-    st.markdown(f"<h3 style='color:{color}' title='{result['Description']}'>🎉 {result['Element']}</h3>", unsafe_allow_html=True)
+    # Detectar si es una tirada potenciada con estrella
+    notes = result.get("Notes", "")
+    is_boosted_star = "Boosted Star Bonus" in notes
+
+    # Visuales adicionales
+    star_icon = "🌟" if is_boosted_star else ""
+    boost_msg = f"<span style='color:#ffcc00;font-weight:bold;'>✨ Boosted Star Bonus Activated!</span><br>" if is_boosted_star else ""
+    border_style = "3px solid #ffcc00" if is_boosted_star else "1px solid #444"
+
+    st.markdown(f"<h3 style='color:{color}' title='{result['Description']}'>{star_icon} 🎉 {result['Element']}</h3>", unsafe_allow_html=True)
     st.markdown(f"<span style='color:{color}'><strong>Rarity</strong>: `{float(result['Rarity']):.2f}` ({tier})</span>", unsafe_allow_html=True)
     st.markdown(f"<span style='color:{color}'><strong>Type</strong>: `{result['Type']}`</span>", unsafe_allow_html=True)
     st.markdown(f"<span style='color:{color}'><strong>Estimated Luck</strong>: `{result['Luck']}` – {luck_type}</span>", unsafe_allow_html=True)
+
+    if notes:
+        st.markdown(f"<span style='color:#cccccc;'><strong>Notes:</strong> {notes}</span>", unsafe_allow_html=True)
+
     st.markdown("---")
     st.markdown(
-        f"<div style='background-color:#111;padding:10px;border-radius:10px;'>"
+        f"<div style='background-color:#111;padding:10px;border-radius:10px;border:{border_style};'>"
+        f"{boost_msg}"
         f"<p style='color:white;font-size:16px;line-height:1.5;text-align:justify;'>{result['Description']}</p>"
         f"</div>",
         unsafe_allow_html=True
@@ -339,11 +411,9 @@ def display_result(result, min_val, max_val):
         "Tier": result["Tier"],
         "Luck": result["Luck"],
         "Description": result["Description"],
-        "Color": result["Color"]
+        "Color": result["Color"],
+        "Notes": notes
     }
-
-    if result.get("Notes"):
-        log_entry["Notes"] = result["Notes"]
 
     st.session_state["log"].append(log_entry)
 

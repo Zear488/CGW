@@ -1,5 +1,6 @@
 import os
 import json
+import re
 from typing import List, Dict
 
 GACHA_LOG_DIR = "gacha_log"
@@ -49,11 +50,22 @@ class GachaHistoryTracker:
             self.points = {"points": 0}
             self._save_json(REPEATS_FILE, self.repeats)
             self._save_json(POINTS_FILE, self.points)
-
     def load_from_log(self, log: List[Dict]):
-           self.repeats = {f"{entry['Type']}::{entry['Element']}": True for entry in log}
-           self._save_json(REPEATS_FILE, self.repeats)
-           self.points = {
-    "points": sum(1 for entry in log if str(entry.get("Notes", "")).startswith("🔁"))
-}
-           self._save_json(POINTS_FILE, self.points)
+        self.repeats = {f"{entry['Type']}::{entry['Element']}": True for entry in log}
+        self._save_json(REPEATS_FILE, self.repeats)
+
+        total_points = 0
+        for entry in log:
+            notes = str(entry.get("Notes", "")).strip()
+
+        # Aceptar variantes de "Repeated" aunque el emoji esté dañado
+            if "Repeated" in notes:
+                total_points += 1
+
+        # Aceptar cualquier "- X TP"
+            match = re.search(r"-\s*(\d+)\s*TP", notes)
+            if match:
+                total_points -= int(match.group(1))
+
+        self.points = {"points": total_points}
+        self._save_json(POINTS_FILE, self.points)
