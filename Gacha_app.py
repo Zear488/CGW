@@ -157,8 +157,6 @@ def read_file_with_weight(filename, avg, min_val, max_val):
 
 import random
 
-import random
-
 def randomizer(min_val, max_val, avg, std_dev=0.8, bonus_chance=0.0048, bonus_max=2.0, max_penalty=0.6, max_attempts=10, alpha=2.2, beta=4.5): 
     min_val = float(min_val)
     max_val = float(max_val)
