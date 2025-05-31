@@ -37,6 +37,7 @@ Chaos_Gacha/
 
 ```bash
 pip install streamlit
+pip install pyinstaller (Only for packaging .exe)
 ```
 
 3. Run the application:
@@ -58,6 +59,8 @@ pyinstaller --onefile ^
   --add-data "gachafiles_versions;gachafiles_versions" ^
   --add-data "gacha_log;gacha_log" ^
   Gacha_app.py
+----------(OPTIONAL/EASIER)----------
+pyinstaller chaos_gacha.spec
 ```
 
 > ⚠️ The `.txt` files in the `gachafiles/` folder and logs must remain next to the `.exe` when distributing the app.
