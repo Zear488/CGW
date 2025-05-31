@@ -155,36 +155,39 @@ def read_file_with_weight(filename, avg, min_val, max_val):
     return elements, weights, rarities, descriptions, weightsum, chosentype
 # ------------------ GACHA FUNCTIONS ------------------
 
-def randomizer(min_val, max_val, avg, std_dev=0.8, bonus_chance=0.0048, bonus_max=2.0, max_penalty=0.7, max_attempts=10):
+import random
+
+def randomizer(min_val, max_val, avg, std_dev=0.8, bonus_chance=0.0048, bonus_max=2.0,
+               max_penalty=0.7, max_attempts=10, alpha=2.5, beta=5.0):
     min_val = float(min_val)
     max_val = float(max_val)
     avg = float(avg)
 
-    alpha = 2.5  # sesgo hacia min
-    beta = 5.0
-
     for attempt in range(1, max_attempts + 1):
-        # Penalización progresiva al promedio
-        penalty_factor = 1 - min(max_penalty, (attempt - 1) * 0.07)  # Límite: -70%
+        # Penalización progresiva: reduce gradualmente el promedio usado
+        penalty_factor = 1 - min(max_penalty, (attempt - 1) * 0.07)
         capped_avg = avg * penalty_factor
 
-        # Generar sesgo con beta (0..1), luego transformar al rango
+        # Sesgo hacia el rango inferior (0..1), transformado entre min y capped_avg
         skew = random.betavariate(alpha, beta)
-        biased_avg = min_val + skew * (avg - min_val)  # centrado entre min y avg
+        biased_avg = min_val + skew * (capped_avg - min_val)
+
+        # Distribución normal alrededor del promedio sesgado
         rarity = random.gauss(biased_avg, std_dev)
 
         # Bonus de rareza ocasional
         if random.random() < bonus_chance:
             rarity += random.uniform(0.1, bonus_max)
 
-        # Clamp al rango permitido
+        # Clampeamos al rango válido
         rarity = max(min_val, min(rarity, max_val))
 
         if min_val <= rarity <= max_val:
             return round(rarity, 2)
 
-    # Fallback si falla todo
+    # Si falla todo, se retorna el peor resultado posible
     return round(min_val, 2)
+
     
 def perform_gacha_draw(mode, min_val, avg, max_val, num_pulls=1, boost_transcendent=False, max_tries=10):
     results = []
