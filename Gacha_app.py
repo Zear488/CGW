@@ -160,22 +160,30 @@ def randomizer(min_val, max_val, avg, std_dev=0.8, bonus_chance=0.0048, bonus_ma
     max_val = float(max_val)
     avg = float(avg)
 
+    alpha = 2.5  # sesgo hacia min
+    beta = 5.0
+
     for attempt in range(1, max_attempts + 1):
-        # Penalización progresiva al promedio para permitir encontrar algo cercano
+        # Penalización progresiva al promedio
         penalty_factor = 1 - min(max_penalty, (attempt - 1) * 0.07)  # Límite: -70%
         capped_avg = avg * penalty_factor
-        rarity = random.gauss(capped_avg, std_dev)
+
+        # Generar sesgo con beta (0..1), luego transformar al rango
+        skew = random.betavariate(alpha, beta)
+        biased_avg = min_val + skew * (avg - min_val)  # centrado entre min y avg
+        rarity = random.gauss(biased_avg, std_dev)
 
         # Bonus de rareza ocasional
         if random.random() < bonus_chance:
             rarity += random.uniform(0.1, bonus_max)
 
-        # Clampeamos dentro de los límites
+        # Clamp al rango permitido
         rarity = max(min_val, min(rarity, max_val))
 
         if min_val <= rarity <= max_val:
             return round(rarity, 2)
-    # Si falla todo, retorna el peor resultado
+
+    # Fallback si falla todo
     return round(min_val, 2)
     
 def perform_gacha_draw(mode, min_val, avg, max_val, num_pulls=1, boost_transcendent=False, max_tries=10):
@@ -193,29 +201,36 @@ def perform_gacha_draw(mode, min_val, avg, max_val, num_pulls=1, boost_transcend
                 adjusted_weights = [w for _, w, _, _ in filtered]
                 filtered_weights_sum = sum(adjusted_weights)
                 if filtered_weights_sum == 0:
-                    break  # skip this pull
+                    break
 
                 selected = random.choices(filtered, weights=adjusted_weights)[0]
                 element, _, rarity, desc = selected
                 bonus_triggered = False
 
-                # Calcular probabilidad total del bonus estrella
-                base_star_chance = 0.0048  # 0.48%
+                base_star_chance = 0.0048
                 tp = tracker.get_points()
                 boost_star_chance = 0.0
 
                 if boost_transcendent and tp >= 5:
-                    boost_star_chance = min(0.0023 * tp, 0.50)  # 0.23% por TP, hasta máximo 50%
+                    boost_star_chance = min(0.0023 * tp, 0.50)
 
                 total_star_chance = base_star_chance + boost_star_chance
 
-                # Aplicar bonus estrella si corresponde
+                # Nuevo bonus estrella con reevaluación y microajuste aleatorio
                 if random.random() < total_star_chance and rarity + 2 <= 10:
-                    rarity += 2
+                    enhanced_rarity = min(10.0, rarity + 2)
+
+                    upgraded = [(e, w, r, d) for e, w, r, d in zip(elements, base_weights, rarities, descriptions)
+                                if abs(r - enhanced_rarity) <= 0.25]
+
+                    if upgraded:
+                        selected = random.choices(upgraded, weights=[w for _, w, _, _ in upgraded])[0]
+                        element, _, rarity, desc = selected
+                        rarity = round(rarity + random.uniform(0.05, 0.40), 2)  # microajuste aleatorio
+
                     element = f"★ {element}"
                     bonus_triggered = True
 
-                # Calcular suerte estimada
                 rarity_range = max_val - min_val
                 if rarity_range == 0:
                     estimated_luck = 100.0
@@ -235,14 +250,16 @@ def perform_gacha_draw(mode, min_val, avg, max_val, num_pulls=1, boost_transcend
                     "Notes": ""
                 }
 
-                # Verificar repetido
+                notes = []
                 if tracker.check_repeat(pull_data):
-                    pull_data["Notes"] = "🔁 Repeated — +1 TP"
+                    notes.append("🔁 Repeated — +1 TP")
 
-                # Si fue boosteado con TP y se activó el bonus, gastar todos los puntos
-                elif bonus_triggered and boost_star_chance > 0:
-                    pull_data["Notes"] = f"✨ Boosted Star Bonus — -{tp} TP"
+                if bonus_triggered and boost_star_chance > 0:
+                    notes.append(f"✨ Boosted Star Bonus — -{tp} TP")
                     tracker.spend_points(tp)
+
+                if notes:
+                    pull_data["Notes"] = " | ".join(notes)
 
                 results.append(pull_data)
                 break
@@ -383,7 +400,7 @@ def display_result(result, min_val, max_val):
     is_boosted_star = "Boosted Star Bonus" in notes
 
     # Visuales adicionales
-    star_icon = "🌟" if is_boosted_star else ""
+    star_icon = "🎉🎉" if is_boosted_star else ""
     boost_msg = f"<span style='color:#ffcc00;font-weight:bold;'>✨ Boosted Star Bonus Activated!</span><br>" if is_boosted_star else ""
     border_style = "3px solid #ffcc00" if is_boosted_star else "1px solid #444"
 
