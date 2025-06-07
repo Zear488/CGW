@@ -10,6 +10,7 @@ from logic.tracker import GachaHistoryTracker
 from logic.gacha_engine import perform_gacha_draw
 import numpy as np
 import math
+import altair as alt
 
 tracker = GachaHistoryTracker()
 
@@ -105,14 +106,22 @@ if st.sidebar.button("🗑️ Clear History"):
 
 # Mostrar puntos actuales
 st.sidebar.markdown(f"⭐ Transcendent Points: `{tracker.get_points()}`")
+
 # ------------------ READ FUNCTION ------------------
+
 def read_file_with_weight(filename, avg, min_val, max_val):
     elements, weights, rarities, descriptions = [], [], [], []
 
     min_rarity = float(min_val)
     avg_rarity = float(avg)
     max_rarity = float(max_val)
-    sigma = 1.2  
+    sigma = 1.2
+    skew_strength = 0.6  # Controla cuánto se aplana del lado derecho
+
+    def custom_weight(rarity):
+        x = (rarity - avg_rarity) / sigma
+        skew = 1.0 + skew_strength if rarity > avg_rarity else 1.0 - skew_strength
+        return math.exp(-x * x * skew)
 
     if filename == "Random":
         filename = random.choice(["Ability", "Item", "Familiar", "Trait", "Skill"])
@@ -136,9 +145,7 @@ def read_file_with_weight(filename, avg, min_val, max_val):
 
                     elements.append(element)
                     rarities.append(rarity)
-
-                    # Nuevo peso basado en distribución gaussiana centrada en avg
-                    weight = math.exp(-((rarity - avg_rarity) ** 2) / (2 * sigma ** 2))
+                    weight = custom_weight(rarity)
                     weights.append(weight)
 
                     if temp_description:
@@ -155,32 +162,29 @@ def read_file_with_weight(filename, avg, min_val, max_val):
     return elements, weights, rarities, descriptions, weightsum, chosentype
 # ------------------ GACHA FUNCTIONS ------------------
 
-import random
-
-def randomizer(min_val, max_val, avg, std_dev=0.8, bonus_chance=0.0048, bonus_max=2.0, max_penalty=0.6, max_attempts=10, alpha=2.2, beta=4.5): 
+def randomizer(min_val, max_val, avg, std_dev=0.8, bonus_chance=0.0048, bonus_max=2.0, max_penalty=0.7, max_attempts=10):
     min_val = float(min_val)
     max_val = float(max_val)
     avg = float(avg)
 
     for attempt in range(1, max_attempts + 1):
-        penalty_factor = 1 - min(max_penalty, (attempt - 1) * 0.07)
+        # Penalización progresiva al promedio para permitir encontrar algo cercano
+        penalty_factor = 1 - min(max_penalty, (attempt - 1) * 0.07)  # Límite: -70%
         capped_avg = avg * penalty_factor
+        rarity = random.gauss(capped_avg, std_dev)
 
-        skew = random.betavariate(alpha, beta)
-        biased_avg = min_val + skew * (capped_avg - min_val)
-
-        rarity = random.gauss(biased_avg, std_dev)
-
+        # Bonus de rareza ocasional
         if random.random() < bonus_chance:
             rarity += random.uniform(0.1, bonus_max)
 
+        # Clampeamos dentro de los límites
         rarity = max(min_val, min(rarity, max_val))
 
         if min_val <= rarity <= max_val:
             return round(rarity, 2)
-
+    # Si falla todo, retorna el peor resultado
     return round(min_val, 2)
-
+    
 def perform_gacha_draw(mode, min_val, avg, max_val, num_pulls=1, boost_transcendent=False, max_tries=10):
     results = []
     elements, base_weights, rarities, descriptions, _, chosentype = read_file_with_weight(mode, avg, min_val, max_val)
@@ -239,12 +243,12 @@ def perform_gacha_draw(mode, min_val, avg, max_val, num_pulls=1, boost_transcend
                     "Element": element,
                     "Rarity": f"{round(rarity, 2):.2f}",
                     "Tier": tier,
-                    "Luck": f"{round(estimated_luck, 2):.2f}%",
+                    "LuckValue": round(estimated_luck, 2),  # Valor numérico puro
+                    "Luck": f"{round(estimated_luck, 2):.2f}%",  # Valor con formato
                     "Description": desc.replace("#", "").strip(),
                     "Color": color,
                     "Notes": ""
                 }
-
                 notes = []
                 if tracker.check_repeat(pull_data):
                     notes.append("🔁 Repeated — +1 TP")
@@ -388,8 +392,12 @@ def classify_luck(luck_value):
 # Función para mostrar un resultado
 def display_result(result, min_val, max_val):
     tier, color = get_tier_and_color(float(result["Rarity"]))
-    luck_type = classify_luck(float(result["Luck"].replace('%', '')))
-
+    if "LuckValue" in result:
+        luck_value = float(result["LuckValue"])
+    else:
+        luck_value = float(result["Luck"].replace('%', ''))
+    luck_type = classify_luck(luck_value)
+    
     # Detectar si es una tirada potenciada con estrella
     notes = result.get("Notes", "")
     is_boosted_star = "Boosted Star Bonus" in notes
@@ -435,6 +443,7 @@ if st.button("🎰 Roll", type="primary"):
     for result in results:
         if result:
             display_result(result, min_val, max_val)
+            st.session_state["show_curve_analysis"] = False
 
 # Botón de Multi-Roll 🎲
 if st.button("🎲 Multi-Roll"):
@@ -442,7 +451,7 @@ if st.button("🎲 Multi-Roll"):
     for result in results:
         if result:
             display_result(result, min_val, max_val)
-
+            st.session_state["show_curve_analysis"] = False
 
 if st.session_state.get("log"):
     st.markdown("## 📜 Roll History")
@@ -491,17 +500,26 @@ if st.session_state.get("log"):
     html(log_html, height=550)
 
     # Exportar CSV con BOM para compatibilidad móvil 
-    df_log = pd.DataFrame(st.session_state["log"])
-    csv_buffer = io.StringIO()
-    df_log.to_csv(csv_buffer, index=False, encoding="utf-8-sig")  # <- BOM encoding
-    csv_data = csv_buffer.getvalue()
+df_log = pd.DataFrame(st.session_state["log"])
 
-    st.download_button(
-        label="⬇️ Download history as CSV",
-        data=csv_data,
-        file_name="gacha_history.csv",
-        mime="text/csv"
-    )
+# Asegura que "Luck" sea texto (por seguridad), y LuckValue se mantenga como numérico
+if "Luck" in df_log.columns:
+    df_log["Luck"] = df_log["Luck"].astype(str)
+
+# Seleccionar columnas específicas si quieres ordenarlas o evitar conflictos
+columns_order = ["Type", "Element", "Rarity", "Tier", "LuckValue", "Luck", "Description", "Color", "Notes"]
+df_log = df_log[[col for col in columns_order if col in df_log.columns]]
+
+csv_buffer = io.StringIO()
+df_log.to_csv(csv_buffer, index=False, encoding="utf-8-sig")
+csv_data = csv_buffer.getvalue()
+
+st.download_button(
+    label="⬇️ Download history as CSV",
+    data=csv_data,
+    file_name="gacha_history.csv",
+    mime="text/csv"
+)
 
 from datetime import datetime
 
@@ -734,3 +752,93 @@ if version_content and base_name:
             st.session_state.setdefault("original_files", {})[base_name] = version_content
         st.success(f"✅ Version added to saved history under '{base_name}' and updated as editable.")
 
+st.markdown("---")
+st.subheader("📊 Bell Curve Analysis")
+
+# Inicialización del toggle en session_state
+if "show_curve_analysis" not in st.session_state:
+    st.session_state["show_curve_analysis"] = False
+
+# Botón que activa/desactiva la visualización
+if st.button("📈 Toggle Bell Curve Analysis"):
+    st.session_state["show_curve_analysis"] = not st.session_state["show_curve_analysis"]
+
+# Solo carga si está activado
+if st.session_state["show_curve_analysis"]:
+    st.markdown("""
+    Customize how you want to visualize the expected rarity distributions and your actual results.
+    """)
+
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        show_normal = st.checkbox("Show Normal Distribution", value=True)
+    with col2:
+        show_bonus = st.checkbox("Show Bonus Distribution", value=True)
+    with col3:
+        show_histogram = st.checkbox("Show Actual Pulls", value=True)
+
+    sample_types = ["Ability", "Item", "Familiar", "Skill", "Trait"]
+    sigma = 1.2
+    skew_strength = 0.6
+    bonus_chance = 0.0048
+    bonus_max = 2.0
+
+    def skewed_gauss(x, avg):
+        skew = 1.0 + skew_strength if x > avg else 1.0 - skew_strength
+        return np.exp(-((x - avg) ** 2) / (2 * sigma ** 2) * skew)
+
+    df_log = pd.DataFrame(st.session_state.get("log", [])) if show_histogram else pd.DataFrame()
+
+    if show_histogram and df_log.empty:
+        st.info("No pulls have been made yet. Pull some results to enable histogram.")
+    else:
+        if show_histogram:
+            if "Rarity" not in df_log.columns:
+                st.warning("Rarity data is missing or log not initialized.")
+                df_log = pd.DataFrame()
+            else:
+                df_log["Rarity"] = pd.to_numeric(df_log["Rarity"], errors="coerce")
+                df_log = df_log.dropna(subset=["Rarity"])
+
+        for pull_type in sample_types:
+            x_vals = np.linspace(min_val, max_val, 500)
+            df_base = pd.DataFrame({"Rarity": x_vals})
+
+            charts = []
+
+            if show_normal:
+                df_base["Skewed"] = [skewed_gauss(x, avg) for x in x_vals]
+                line_skewed = alt.Chart(df_base).mark_line(color="skyblue").encode(
+                    x="Rarity",
+                    y=alt.Y("Skewed", title="Weight (Normal)"),
+                    tooltip=["Rarity", "Skewed"]
+                ).properties(title=f"{pull_type} — Distribution")
+                charts.append(line_skewed)
+
+            if show_bonus:
+                base_curve = np.array([skewed_gauss(x, avg) for x in x_vals])
+                bonus_peak = np.array([
+                    bonus_chance * np.exp(-((x - (avg + bonus_max / 2)) ** 2) / (2 * sigma ** 2))
+                    for x in x_vals
+                ])
+                df_base["Bonus"] = base_curve + bonus_peak
+                line_bonus = alt.Chart(df_base).mark_line(color="orange").encode(
+                    x="Rarity",
+                    y=alt.Y("Bonus", title="Weight (Bonus)"),
+                    tooltip=["Rarity", "Bonus"]
+                )
+                charts.append(line_bonus)
+
+            if show_histogram and not df_log.empty:
+                pulls_type = df_log[df_log["Type"].str.lower() == pull_type.lower()]
+                if not pulls_type.empty:
+                    hist = alt.Chart(pulls_type).mark_bar(opacity=0.5, color="white").encode(
+                        x=alt.X("Rarity", bin=alt.Bin(maxbins=25), title="Rarity"),
+                        y=alt.Y("count()", title="Pull Count"),
+                        tooltip=["count()"]
+                    )
+                    charts.append(hist)
+
+            if charts:
+                chart = alt.layer(*charts).resolve_scale(y='independent').interactive()
+                st.altair_chart(chart, use_container_width=True)
