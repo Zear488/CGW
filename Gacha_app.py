@@ -446,9 +446,9 @@ if st.button("🎰 Roll", type="primary"):
             display_result(result, min_val, max_val)
             new_entries.append(result)
     st.session_state["log"].extend(new_entries)
+    tracker.load_from_log(st.session_state["log"])  
     st.session_state["show_curve_analysis"] = False
 
-# 🎲 Botón Multi-Roll
 if st.button("🎲 Multi-Roll"):
     results = perform_gacha_draw(mode, min_val, avg, max_val, num_pulls=pull_count, boost_transcendent=True)
     new_entries = []
@@ -457,6 +457,7 @@ if st.button("🎲 Multi-Roll"):
             display_result(result, min_val, max_val)
             new_entries.append(result)
     st.session_state["log"].extend(new_entries)
+    tracker.load_from_log(st.session_state["log"])  
     st.session_state["show_curve_analysis"] = False
 
 # Mostrar historial si existe
