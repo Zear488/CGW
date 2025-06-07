@@ -11,6 +11,7 @@ from logic.gacha_engine import perform_gacha_draw
 import numpy as np
 import math
 import altair as alt
+import time
 
 tracker = GachaHistoryTracker()
 
@@ -434,102 +435,134 @@ def display_result(result, min_val, max_val):
     }
 
 # Botón individual 🎰 Roll
+# Al hacer una tirada, desactiva la variable csv_data para evitar pre-render CSV
+
+# Inicializar control anti-spam si no existe
+if "last_click_time" not in st.session_state:
+    st.session_state["last_click_time"] = 0
+
+# Tiempo mínimo entre clics (en segundos)
+CLICK_DELAY = 0.2
+
+# 🎰 Roll 
 if st.button("🎰 Roll", type="primary"):
-    results = perform_gacha_draw(mode, min_val, avg, max_val, num_pulls=1, boost_transcendent=True)
-    new_entries = []
-    for result in results:
-        if result:
-            display_result(result, min_val, max_val)
-            new_entries.append(result)
-    st.session_state["log"].extend(new_entries)
-    tracker.load_from_log(st.session_state["log"])  
-    st.session_state["show_curve_analysis"] = False
+    now = time.time()
+    if now - st.session_state["last_click_time"] >= CLICK_DELAY:
+        st.session_state["last_click_time"] = now
+        st.session_state["csv_data"] = None  # 🚫 Evitar generación automática
+        results = perform_gacha_draw(mode, min_val, avg, max_val, num_pulls=1, boost_transcendent=True)
+        new_entries = []
+        result_container = st.container()
+        with result_container:
+            for result in results:
+                if result:
+                    display_result(result, min_val, max_val)
+                    new_entries.append(result)
+        st.session_state["log"].extend(new_entries)
+        tracker.load_from_log(st.session_state["log"])
+        st.session_state["show_curve_analysis"] = False
+    else:
+        st.warning("⏳ Please wait a moment before clicking again.")
 
+# 🎲 Multi-Roll 
 if st.button("🎲 Multi-Roll"):
-    results = perform_gacha_draw(mode, min_val, avg, max_val, num_pulls=pull_count, boost_transcendent=True)
-    new_entries = []
-    for result in results:
-        if result:
-            display_result(result, min_val, max_val)
-            new_entries.append(result)
-    st.session_state["log"].extend(new_entries)
-    tracker.load_from_log(st.session_state["log"])  
-    st.session_state["show_curve_analysis"] = False
+    now = time.time()
+    if now - st.session_state["last_click_time"] >= CLICK_DELAY:
+        st.session_state["last_click_time"] = now
+        st.session_state["csv_data"] = None  # 🚫 Evitar generación automática
+        results = perform_gacha_draw(mode, min_val, avg, max_val, num_pulls=pull_count, boost_transcendent=True)
+        new_entries = []
+        result_container = st.container()
+        with result_container:
+            for result in results:
+                if result:
+                    display_result(result, min_val, max_val)
+                    new_entries.append(result)
+        st.session_state["log"].extend(new_entries)
+        tracker.load_from_log(st.session_state["log"])
+        st.session_state["show_curve_analysis"] = False
+    else:
+        st.warning("⏳ Please wait a moment before clicking again.")
 
-# Mostrar historial si existe
-if st.session_state.get("log") and not st.session_state.get("rendering_log"):
-    st.session_state["rendering_log"] = True  # 🛡️ Flag para evitar conflicto de DOM
 
-    st.markdown("## 📜 Roll History")
-    st.markdown(f"Total Rolls: **{len(st.session_state['log'])}**")
+# Mostrar historial y permitir descarga solo después de al menos una tirada
+if st.session_state.get("log"):
+    if "show_history" not in st.session_state:
+        st.session_state["show_history"] = False
 
-    log_html = """
-    <div style='
-        max-height: 500px;
-        overflow-y: auto;
-        padding-right: 10px;
-        margin-bottom: 20px;
-        border: 1px solid #333;
-        border-radius: 10px;
-        padding: 10px;
-        background-color: #1e1e1e;
-    '>
-    """
-    for i, entry in enumerate(reversed(st.session_state["log"]), 1):
-        color = entry.get("Color", "#f0f0f0")
-        log_html += f"""
+    if st.button("📜 Show Roll History"):
+        st.session_state["show_history"] = not st.session_state["show_history"]
+
+    if st.session_state["show_history"] and not st.session_state.get("rendering_log"):
+        st.session_state["rendering_log"] = True
+
+        st.markdown("## 📜 Roll History")
+        st.markdown(f"Total Rolls: **{len(st.session_state['log'])}**")
+
+        log_html = """
         <div style='
-            background-color:#222;
-            padding:15px;
-            margin:10px 0;
-            border-radius:10px;
-            box-shadow:0 0 5px rgba(255,255,255,0.1);
+            max-height: 500px;
+            overflow-y: auto;
+            padding-right: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #333;
+            border-radius: 10px;
+            padding: 10px;
+            background-color: #1e1e1e;
         '>
-            <h4 style='color:{color};margin-bottom:5px;'>#{len(st.session_state["log"]) - i + 1} — {entry.get("Element", "Unknown")}</h4>
-            <p style='margin:2px 0;color:{color};'><strong>Type:</strong> {entry.get("Type", "-")}</p>
-            <p style='margin:2px 0;color:{color};'><strong>Rarity:</strong> {entry.get("Rarity", "-")} ({entry.get("Tier", "-")})</p>
-            <p style='margin:2px 0;color:{color};'><strong>Luck:</strong> {entry.get("Luck", "-")}</p>
-            <p style='margin:10px 0 0 0;'><strong>Description:</strong></p>
-            <div style='
-                background-color:#111;
-                padding:10px;
-                border-radius:8px;
-                color:#ddd;
-                font-size:14px;
-                white-space:pre-wrap;
-                word-wrap:break-word;
-            '>{entry.get("Description", "No description")}</div>
-        </div>
         """
-    log_html += "</div>"
+        for i, entry in enumerate(reversed(st.session_state["log"]), 1):
+            color = entry.get("Color", "#f0f0f0")
+            log_html += f"""
+            <div style='
+                background-color:#222;
+                padding:15px;
+                margin:10px 0;
+                border-radius:10px;
+                box-shadow:0 0 5px rgba(255,255,255,0.1);
+            '>
+                <h4 style='color:{color};margin-bottom:5px;'>#{len(st.session_state["log"]) - i + 1} — {entry.get("Element", "Unknown")}</h4>
+                <p style='margin:2px 0;color:{color};'><strong>Type:</strong> {entry.get("Type", "-")}</p>
+                <p style='margin:2px 0;color:{color};'><strong>Rarity:</strong> {entry.get("Rarity", "-")} ({entry.get("Tier", "-")})</p>
+                <p style='margin:2px 0;color:{color};'><strong>Luck:</strong> {entry.get("Luck", "-")}</p>
+                <p style='margin:10px 0 0 0;'><strong>Description:</strong></p>
+                <div style='
+                    background-color:#111;
+                    padding:10px;
+                    border-radius:8px;
+                    color:#ddd;
+                    font-size:14px;
+                    white-space:pre-wrap;
+                    word-wrap:break-word;
+                '>{entry.get("Description", "No description")}</div>
+            </div>
+            """
+        log_html += "</div>"
 
-    html(log_html, height=550)
+        html(log_html, height=550)
 
-    st.session_state["rendering_log"] = False
+        st.session_state["rendering_log"] = False
 
-    # Exportar CSV con BOM para compatibilidad móvil 
-df_log = pd.DataFrame(st.session_state["log"])
+        df_log = pd.DataFrame(st.session_state["log"])
+        if "Luck" in df_log.columns:
+            df_log["Luck"] = df_log["Luck"].astype(str)
+        columns_order = ["Type", "Element", "Rarity", "Tier", "LuckValue", "Luck", "Description", "Color", "Notes"]
+        df_log = df_log[[col for col in columns_order if col in df_log.columns]]
 
-# Asegura que "Luck" sea texto (por seguridad), y LuckValue se mantenga como numérico
-if "Luck" in df_log.columns:
-    df_log["Luck"] = df_log["Luck"].astype(str)
+        if st.button("⬇️ Generate CSV File"):
+            csv_buffer = io.StringIO()
+            df_log.to_csv(csv_buffer, index=False, encoding="utf-8-sig")
+            csv_data = csv_buffer.getvalue()
+            st.session_state["csv_data"] = csv_data
 
-# Seleccionar columnas específicas si quieres ordenarlas o evitar conflictos
-columns_order = ["Type", "Element", "Rarity", "Tier", "LuckValue", "Luck", "Description", "Color", "Notes"]
-df_log = df_log[[col for col in columns_order if col in df_log.columns]]
+        if st.session_state.get("csv_data"):
+            st.download_button(
+                label="📥 Download History as CSV",
+                data=st.session_state["csv_data"],
+                file_name="gacha_history.csv",
+                mime="text/csv"
+            )
 
-csv_buffer = io.StringIO()
-df_log.to_csv(csv_buffer, index=False, encoding="utf-8-sig")
-csv_data = csv_buffer.getvalue()
-
-st.download_button(
-    label="⬇️ Download history as CSV",
-    data=csv_data,
-    file_name="gacha_history.csv",
-    mime="text/csv"
-)
-
-from datetime import datetime
 
 # Carpetas que usadas:
 # - "Original_gachafiles" para los archivos originales
@@ -850,4 +883,3 @@ if st.session_state["show_curve_analysis"]:
             if charts:
                 chart = alt.layer(*charts).resolve_scale(y='independent').interactive()
                 st.altair_chart(chart, use_container_width=True)
-
