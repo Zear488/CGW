@@ -397,12 +397,10 @@ def display_result(result, min_val, max_val):
     else:
         luck_value = float(result["Luck"].replace('%', ''))
     luck_type = classify_luck(luck_value)
-    
-    # Detectar si es una tirada potenciada con estrella
+
     notes = result.get("Notes", "")
     is_boosted_star = "Boosted Star Bonus" in notes
 
-    # Visuales adicionales
     star_icon = "🎉🎉" if is_boosted_star else ""
     boost_msg = f"<span style='color:#ffcc00;font-weight:bold;'>✨ Boosted Star Bonus Activated!</span><br>" if is_boosted_star else ""
     border_style = "3px solid #ffcc00" if is_boosted_star else "1px solid #444"
@@ -434,8 +432,6 @@ def display_result(result, min_val, max_val):
         "Color": result["Color"],
         "Notes": notes
     }
-
-    st.session_state["log"].append(log_entry)
 
 # Botón individual 🎰 Roll
 if st.button("🎰 Roll", type="primary"):
@@ -854,3 +850,4 @@ if st.session_state["show_curve_analysis"]:
             if charts:
                 chart = alt.layer(*charts).resolve_scale(y='independent').interactive()
                 st.altair_chart(chart, use_container_width=True)
+
