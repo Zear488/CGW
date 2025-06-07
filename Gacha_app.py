@@ -440,24 +440,32 @@ def display_result(result, min_val, max_val):
 # Botón individual 🎰 Roll
 if st.button("🎰 Roll", type="primary"):
     results = perform_gacha_draw(mode, min_val, avg, max_val, num_pulls=1, boost_transcendent=True)
+    new_entries = []
     for result in results:
         if result:
             display_result(result, min_val, max_val)
-            st.session_state["show_curve_analysis"] = False
+            new_entries.append(result)
+    st.session_state["log"].extend(new_entries)
+    st.session_state["show_curve_analysis"] = False
 
-# Botón de Multi-Roll 🎲
+# 🎲 Botón Multi-Roll
 if st.button("🎲 Multi-Roll"):
     results = perform_gacha_draw(mode, min_val, avg, max_val, num_pulls=pull_count, boost_transcendent=True)
+    new_entries = []
     for result in results:
         if result:
             display_result(result, min_val, max_val)
-            st.session_state["show_curve_analysis"] = False
+            new_entries.append(result)
+    st.session_state["log"].extend(new_entries)
+    st.session_state["show_curve_analysis"] = False
 
-if st.session_state.get("log"):
+# Mostrar historial si existe
+if st.session_state.get("log") and not st.session_state.get("rendering_log"):
+    st.session_state["rendering_log"] = True  # 🛡️ Flag para evitar conflicto de DOM
+
     st.markdown("## 📜 Roll History")
     st.markdown(f"Total Rolls: **{len(st.session_state['log'])}**")
 
-    # Mostrar historial como HTML
     log_html = """
     <div style='
         max-height: 500px;
@@ -497,7 +505,10 @@ if st.session_state.get("log"):
         </div>
         """
     log_html += "</div>"
+
     html(log_html, height=550)
+
+    st.session_state["rendering_log"] = False
 
     # Exportar CSV con BOM para compatibilidad móvil 
 df_log = pd.DataFrame(st.session_state["log"])
